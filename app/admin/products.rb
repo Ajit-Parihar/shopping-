@@ -16,19 +16,30 @@ ActiveAdmin.register Product do
     f.actions
   end
 
+  filter :name
+  filter :brand_name
+  filter :business, as: :select, collection: -> {
+    if current_admin_user.user_type == 'admin'
+      Business.all.map { |b| [b.category, b.id] }
+    else
+      Business.where(seller_id: current_admin_user.id).map { |b| ["Business (#{b.category})", b.id] }
+    end
+  }, label: "Business Name"
+ 
+
   controller do
     def scoped_collection
       if current_admin_user.user_type == "admin"
         Product.all
       else
-        product_ids = SellerProduct.where(seller_id: current_admin_user.id)
-        Product.where(id: product_ids)
+        seller_product_ids = SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id)
+        Product.where(id: seller_product_ids)
       end
     end
   end
 
-  index do 
-     selectable_column 
+  index do
+     selectable_column
       id_column
       column :name
       column :brand_name
@@ -41,8 +52,12 @@ ActiveAdmin.register Product do
         end
       end
    end
-   
-  show do 
+
+  show do
+    item = params[:id]
+    unless SellerProduct.find_by(product_id: item.to_i)
+        SellerProduct.create(seller_id: current_admin_user.id, product_id: item.to_i)
+    end
      attributes_table do 
       row :image do |product|
              if product.image.attached?
@@ -56,6 +71,8 @@ ActiveAdmin.register Product do
        row :brand_name
       end
       orders = Order.where(product_id: product.id) 
+      puts "working fine"
+      puts orders.inspect
       sellers = SellerProduct.where(product_id: product.id)
             panel "buyers" do
                table_for orders do

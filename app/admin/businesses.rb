@@ -5,7 +5,7 @@ ActiveAdmin.register Business do
 
     form do |f|
       f.inputs "Business Details" do
-        f.input :category
+        f.input :category, as: :radio, collection: Rails.application.config.images_hash.keys, label: "Product Category"  
         f.input :seller_id, input_html: { value: current_admin_user.id, readonly: true }
       end
       f.actions
@@ -43,8 +43,9 @@ ActiveAdmin.register Business do
           "No image available"
           end
       end
-      # column "Orders" do |business|
-      #   link_to "View Orders", admin_orders_path(business_id: business.id)      end
+      column "Orders" do |business|
+        link_to "View Orders", admin_orders_path(business_id: business.id)     
+       end
       actions
     end
 

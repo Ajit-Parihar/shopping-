@@ -13,6 +13,7 @@ class Ability
       can :read, ActiveAdmin::Page, :name => "Home"
       can :manage, Business
       can :manage, Product
+      can :manage, Order
     else
       can :read, ActiveAdmin::Page, :name => "Home"
     end

@@ -10,4 +10,6 @@ class AdminUser < ApplicationRecord
 
    has_many :businesses, foreign_key: "seller_id", dependent: :destroy
    has_one :seller_product, foreign_key: "seller_id", dependent: :destroy
+     has_many :orders_as_user, class_name: 'Order', foreign_key: 'user_id'
+  has_many :orders_as_seller, class_name: 'Order', foreign_key: 'seller_id'
 end
