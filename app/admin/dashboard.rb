@@ -10,6 +10,15 @@ ActiveAdmin.register_page "Dashboard" do
       end
     end
 
+    if current_admin_user&.user_type == "admin"
+      section "User Role Distribution" do
+        render partial: "admin/user_role_chart"
+      end
+    end
+
+
+  
+
     # Here is an example of a simple dashboard with columns and panels.
     #
     # columns do
@@ -29,5 +38,6 @@ ActiveAdmin.register_page "Dashboard" do
     #     end
     #   end
     # end
-  end # content
+    # content
+  end
 end

@@ -28,6 +28,19 @@ ActiveAdmin.register Product do
  
 
   controller do
+    def create
+      super do |success, failure|
+        success.html do
+          SellerProduct.create!(
+            product_id: resource.id,              # ← fixed line
+            seller_id: current_admin_user.id
+          )
+          redirect_to admin_products_path and return
+        end
+        failure.html { render :new }
+      end
+    end
+      
     def scoped_collection
       if current_admin_user.user_type == "admin"
         Product.all
@@ -56,6 +69,7 @@ ActiveAdmin.register Product do
   show do
     item = params[:id]
     unless SellerProduct.find_by(product_id: item.to_i)
+
         SellerProduct.create(seller_id: current_admin_user.id, product_id: item.to_i)
     end
      attributes_table do 

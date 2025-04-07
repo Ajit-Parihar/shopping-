@@ -1,20 +1,32 @@
 
 ActiveAdmin.register Order do
+  permit_params :user_id, :product_id, :seller_id, :business_id
 
   controller do
     def scoped_collection
-      if current_admin_user
+      if current_admin_user.user_type == "admin"
         Order.all
         Order.where(id: Order.select("MIN(id)").group(:product_id))
       else
-         Order.where(seller_id: current_admin_user)
-         Order.where(id: Order.select("MIN(id)").group(:product_id))
+
+        seller_orders = Order.where(seller_id: current_admin_user.id)
+        Order.where(id: seller_orders.select("MIN(id)").group(:product_id))
       end
     end
   end
 
-  filter :name
-  filter :brand_name
+  form do |f|
+    f.inputs "Create Order" do
+      f.input :user_id, label: "Buyer", as: :select, collection: AdminUser.where(user_type: ["user", "seller"]).where.not(id: current_admin_user.id).map { |u| [u.email, u.id] }
+      f.input :product_id, as: :select, collection: Product.all.map { |p| ["#{p.name} (#{p.brand_name})", p.id] }
+      # f.input :seller_id, input_html: { value: current_admin_user.id, readonly: true }
+      f.object.seller_id = current_admin_user.id
+      f.input :business_id, as: :select, collection: Business.all.map { |b| [b.category, b.id] }
+    end
+  
+    f.actions
+  end
+  
   filter :business, as: :select, collection: -> {
     if current_admin_user.user_type == 'admin'
       Business.all.map { |b| [b.category, b.id] }
@@ -23,13 +35,12 @@ ActiveAdmin.register Order do
     end
   }, label: "Business Name"
  
-
 index do
    paramsbusiness = params[:business_id]
    flag = false
    orders.each do |order|
      product = Product.find(order.product.id)
-     puts product.business_id.inspect
+
      if paramsbusiness==nil
         flag = true
      end
@@ -37,6 +48,17 @@ index do
           flag = true
      end
    end
+
+   if current_admin_user.user_type == 'admin'
+       selectable_column
+      column "product Name" do |order|
+           Product.find(order.product_id).name
+      end
+      column "product price" do |order|
+         Product.find(order.product_id).price
+      end
+     actions
+    else
    if flag
    selectable_column
    column "Product Name" do |order|
@@ -69,12 +91,30 @@ index do
    actions
   end
 end
+end
 
 show do
-user = AdminUser.find(order.user_id) 
-all_orders = Order.where(seller_id: current_admin_user.id) 
-
-panel "Total buyers have purchased this product" do
+  if current_admin_user.user_type == 'admin'
+    user = AdminUser.find(order.user_id)
+    order_id = Order.find(params[:id])
+    all_orders = Order.where(product_id: order_id.product_id)
+    panel "Total buyers have purchased this product" do
+      table_for all_orders do
+        column "User" do |order|
+          order.user.email
+        end
+        column "Ordered At" do |order|
+          order.created_at.strftime("%B %d, %Y %H:%M")
+        end
+        column "Seller" do |order|
+            order.seller.email
+        end
+      end
+    end
+  else
+ user = AdminUser.find(order.user_id) 
+ all_orders = Order.where(seller_id: current_admin_user.id) 
+ panel "Total buyers have purchased this product" do
   table_for all_orders do
     column "User" do |order|
       order.user.email
@@ -86,6 +126,7 @@ panel "Total buyers have purchased this product" do
         order.seller.email
     end
   end
+end
 end
 end
 end

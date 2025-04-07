@@ -28,7 +28,12 @@ ActiveAdmin.register Business do
       end
     end
 
-    index do
+    filter :category
+    filter :seller_id, as: :select, collection: -> {
+  AdminUser.where(user_type: 'seller').map { |u| [u.email, u.id] }
+}
+
+    index do |res|
       selectable_column
       id_column
       column :seller
@@ -49,7 +54,7 @@ ActiveAdmin.register Business do
       actions
     end
 
-      show do
+      show do |res|
        products = Product
       .where(business_id: business.id)
       .select("name, MAX(id) AS id, MAX(price) AS price, MAX(brand_name) AS brand_name")
@@ -79,7 +84,11 @@ ActiveAdmin.register Business do
             column :price
             column :brand_name
             column :image do |product|
-              image_tag product.image, alt: product.name, style: 'max-width: 300px;' 
+              if product.image.attached?
+                image_tag url_for(product.image), alt: product.name, style: 'max-width: 300px;'
+              else
+                "No image"
+              end
             end
        end
        end

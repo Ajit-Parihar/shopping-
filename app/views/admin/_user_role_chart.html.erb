@@ -1,0 +1,5 @@
+<h3>User Role Distribution</h3>
+<%= pie_chart AdminUser.group(:user_type).count, height: "300px", library: {
+  title: { text: "User Roles", fontSize: 18 },
+  colors: ["#00bcd4", "#8bc34a", "#ffc107", "#e91e63"]
+} %>
