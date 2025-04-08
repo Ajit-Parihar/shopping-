@@ -19,7 +19,6 @@ ActiveAdmin.register Order do
     f.inputs "Create Order" do
       f.input :user_id, label: "Buyer", as: :select, collection: AdminUser.where(user_type: ["user", "seller"]).where.not(id: current_admin_user.id).map { |u| [u.email, u.id] }
       f.input :product_id, as: :select, collection: Product.all.map { |p| ["#{p.name} (#{p.brand_name})", p.id] }
-      # f.input :seller_id, input_html: { value: current_admin_user.id, readonly: true }
       f.object.seller_id = current_admin_user.id
       f.input :business_id, as: :select, collection: Business.all.map { |b| [b.category, b.id] }
     end
@@ -58,7 +57,8 @@ index do
          Product.find(order.product_id).price
       end
      actions
-    else
+   else
+
    if flag
    selectable_column
    column "Product Name" do |order|
@@ -80,17 +80,17 @@ index do
       business = product.business_id
         if paramsbusiness.to_i == business
             Product.find(order.product_id).price
-          else 
+        else 
             if paramsbusiness == nil && current_admin_user
               if order.seller_id == current_admin_user.id
                 Product.find(order.product_id).price
               end
             end
-          end
+        end
         end
    actions
-  end
-end
+   end
+   end
 end
 
 show do

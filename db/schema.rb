@@ -1,5 +1,16 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
+#
+# It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_07_090457) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_08_125237) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -42,6 +53,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_090457) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "add_to_cards", force: :cascade do |t|
+    t.integer "quantity"
+    t.integer "admin_user_id", null: false
+    t.integer "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_user_id"], name: "index_add_to_cards_on_admin_user_id"
+    t.index ["product_id"], name: "index_add_to_cards_on_product_id"
+  end
+
   create_table "admin_users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -51,6 +72,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_090457) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "user_type"
+    t.string "first_name"
+    t.string "last_name"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -78,11 +101,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_090457) do
 
   create_table "products", force: :cascade do |t|
     t.string "name"
-    t.string "price"
     t.string "brand_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "business_id", null: false
+    t.integer "price"
     t.index ["business_id"], name: "index_products_on_business_id"
   end
 
@@ -91,12 +114,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_090457) do
     t.datetime "updated_at", null: false
     t.bigint "seller_id", null: false
     t.bigint "product_id", null: false
+    t.integer "sold_count"
     t.index ["product_id"], name: "index_seller_products_on_product_id"
     t.index ["seller_id"], name: "index_seller_products_on_seller_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "add_to_cards", "admin_users"
+  add_foreign_key "add_to_cards", "products"
   add_foreign_key "businesses", "admin_users", column: "seller_id"
   add_foreign_key "orders", "admin_users", column: "seller_id"
   add_foreign_key "orders", "businesses"

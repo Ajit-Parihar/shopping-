@@ -132,7 +132,7 @@ ActiveAdmin.setup do |config|
   #
   # Set the action to call for the root path. You can set different
   # roots for each namespace.
-  #
+  
   # Default:
   config.root_to = 'home#index'
 
@@ -181,7 +181,7 @@ ActiveAdmin.setup do |config|
   # Set the localize format to display dates and times.
   # To understand how to localize your app with I18n, read more at
   # https://guides.rubyonrails.org/i18n.html
-  #
+  
   # You can run `bin/rails runner 'puts I18n.t("date.formats")'` to see the
   # available formats in your application.
   #

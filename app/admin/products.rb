@@ -15,7 +15,7 @@ ActiveAdmin.register Product do
         end
     f.actions
   end
-
+  
   filter :name
   filter :brand_name
   filter :business, as: :select, collection: -> {
@@ -26,13 +26,12 @@ ActiveAdmin.register Product do
     end
   }, label: "Business Name"
  
-
   controller do
     def create
       super do |success, failure|
         success.html do
           SellerProduct.create!(
-            product_id: resource.id,              # ← fixed line
+            product_id: resource.id,            
             seller_id: current_admin_user.id
           )
           redirect_to admin_products_path and return
@@ -51,25 +50,34 @@ ActiveAdmin.register Product do
     end
   end
 
-  index do
-     selectable_column
-      id_column
-      column :name
-      column :brand_name
-      column :price
-      column :image do |product|
-        if product.image.attached?
-          link_to image_tag(product.image, alt: product.name, style: 'max-width: 300px;'), admin_product_path(product)
-        else
-          "No image available"
-        end
+  index  row_class: ->(product) { "clickable-row" } do
+    selectable_column
+    id_column
+  
+    column :name do |product|
+      truncate(product.name, length: 30)
+    end
+  
+    column :price do |product|
+      number_to_currency(product.price, unit: "₹", precision: 0)
+    end
+  
+    column "Image" do |product|
+      if product.image.attached?
+          image_tag url_for(product.image), alt: product.name, class: "product-thumb", onclick: "highlightImage(this)"
+      else
+        status_tag "No Image", :warning
       end
-   end
+    end
+
+    column "" do |product|
+      content_tag(:span, "", class: "row-link", data: { href: admin_product_path(product) })
+    end
+  end
 
   show do
     item = params[:id]
     unless SellerProduct.find_by(product_id: item.to_i)
-
         SellerProduct.create(seller_id: current_admin_user.id, product_id: item.to_i)
     end
      attributes_table do 
@@ -78,15 +86,13 @@ ActiveAdmin.register Product do
                 image_tag product.image, alt: product.name, style: 'max-width: 300px;' 
                  else
                 "No image available"
-              end
+              end 
             end
        row :price
        row :name
        row :brand_name
       end
       orders = Order.where(product_id: product.id) 
-      puts "working fine"
-      puts orders.inspect
       sellers = SellerProduct.where(product_id: product.id)
             panel "buyers" do
                table_for orders do
@@ -102,4 +108,35 @@ ActiveAdmin.register Product do
           end 
       end
    end
+
+   member_action :buy_product, method: :post do
+
+    product = Product.find(params[:id])
+    
+    sellerProduct = SellerProduct.find_by(product_id: product.id)
+
+     sold_count = sellerProduct.sold_count
+     if sold_count == nil
+      sold_count = 0
+    end
+    sellerProduct.update(sold_count: sold_count+1)
+     sellerProduct.save
+    render json: { message: "Product bought successfully!" }
+  end
+
+  member_action :add_to_card, method: :post do
+
+    product = Product.find(params[:id])
+    
+    # sellerProduct = SellerProduct.find_by(product_id: product.id)
+
+    #  sold_count = sellerProduct.sold_count
+    #  if sold_count == nil
+    #   sold_count = 0
+    # end
+    # sellerProduct.update(sold_count: sold_count+1)
+    #  sellerProduct.save
+    render json: { message: "Product bought successfully!" }
+  end
+  
 end

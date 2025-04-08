@@ -3,6 +3,9 @@ ActiveAdmin.register Business do
 
     permit_params :category, :seller_id, :create_at, :updated_at
 
+    scope :all, default: true
+    scope("With User") { |businesses| businesses.where.not(seller_id: nil) }
+
     form do |f|
       f.inputs "Business Details" do
         f.input :category, as: :radio, collection: Rails.application.config.images_hash.keys, label: "Product Category"  
@@ -11,16 +14,9 @@ ActiveAdmin.register Business do
       f.actions
     end
 
-    scope :all, default: true
-    scope("With User") { |businesses| businesses.where.not(seller_id: nil) }
-
     controller do
       def scoped_collection
-        if current_admin_user.user_type == "admin"
-
-          puts current_admin_user.inspect
-            puts "all okey"
-
+        if current_admin_user.user_type == "admin" || current_admin_user.user_type == "user"
           Business.all
         else
           Business.where(seller_id: current_admin_user) 
@@ -33,7 +29,7 @@ ActiveAdmin.register Business do
   AdminUser.where(user_type: 'seller').map { |u| [u.email, u.id] }
 }
 
-    index do |res|
+    index row_class: -> (business) { "clickable-row" } do 
       selectable_column
       id_column
       column :seller
@@ -43,7 +39,7 @@ ActiveAdmin.register Business do
         category = business.category
         image_url = Rails.application.config.images_hash[category.to_sym] if Rails.application.config.images_hash.key?(category.to_sym)
           if image_url
-           link_to image_tag(image_url, alt: "#{category} Image", style: "max-width: 300px;"), admin_business_path(business)
+          image_tag(image_url, alt: "#{category} Image", style: "max-width: 300px;", class: "product-thumb", onclick: "highlightImage(this)")
           else
           "No image available"
           end
@@ -51,48 +47,60 @@ ActiveAdmin.register Business do
       column "Orders" do |business|
         link_to "View Orders", admin_orders_path(business_id: business.id)     
        end
+
+       column "" do |business|
+          content_tag(:span, "", class: "row-link", data: {href: admin_business_path(business)} )
+       end
       actions
     end
 
-      show do |res|
-       products = Product
-      .where(business_id: business.id)
-      .select("name, MAX(id) AS id, MAX(price) AS price, MAX(brand_name) AS brand_name")
-      .group(:name)
+show do |res|
+user_seller = AdminUser.find(business.seller_id)
+seller = "#{user_seller.first_name} #{user_seller.last_name}"
 
-      user_seller = AdminUser.find(business.seller_id)
-      seller = user_seller.email
-      attributes_table do
-        row :seller do
-          seller
-       end
-         row :category
-         row :image do |business|
-          category = business.category
-          image_url = Rails.application.config.images_hash[category.to_sym] if Rails.application.config.images_hash.key?(category.to_sym)
-          if image_url
-           link_to image_tag(image_url, alt: "#{category} Image", style: "max-width: 300px;"), admin_business_path(business)
-          else
-          "No image available"
-          end
-      end
-      end
-
-       panel "products" do 
-       table_for products do
-            column :name
-            column :price
-            column :brand_name
-            column :image do |product|
-              if product.image.attached?
-                image_tag url_for(product.image), alt: product.name, style: 'max-width: 300px;'
-              else
-                "No image"
-              end
-            end
-       end
-       end
+div class: "business-header" do
+  attributes_table_for business do
+    row :seller do
+      seller
     end
+    row :category 
+    row :image do |b|
+      category = b.category
+      image_url = Rails.application.config.images_hash[category.to_sym] if Rails.application.config.images_hash.key?(category.to_sym)
+      if image_url
+        image_tag image_url, alt: "#{category} Image", class: "header-image"
+      else
+        "No image available"
+      end
+    end
+  end
+end
+
+panel "Products", class: "fade-in-section" do
+  products = Product
+              .where(business_id: business.id)
+              .select("name, MAX(id) AS id, MAX(price) AS price, MAX(brand_name) AS brand_name")
+              .group(:name)
+
+  table_for products do
+    column :name
+    column :price 
+    column :brand_name
+    column :image do |product|
+      if product.image.attached?
+        image_tag url_for(product.image), alt: product.name, style: 'max-width: 300px;',  class: "product-thumb"
+      else
+        "No image"
+      end
+    end
+    column "Actions" do |product|
+      span link_to "Buy", "#", class: "button buy-button", data: {product_id: product.id}, onclick: "buyProduct(this)"
+        span " "
+      span link_to "Add to Cart", "#", class: "button cart-button", data: {product_id: product.id}, onclick: "addToCard(this)"
+    end
+   end
+  end
+ end
 end
 
 
