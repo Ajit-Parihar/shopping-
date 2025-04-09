@@ -46,7 +46,7 @@ ActiveAdmin.register Order do
          },
          label: "Business Name"
 
-  index do
+  index do |res|
     paramsbusiness = params[:business_id]
     flag = false
 
@@ -60,10 +60,10 @@ ActiveAdmin.register Order do
     if current_admin_user.admin?
       selectable_column
       column "Product Name" do |order|
-        Product.find(order.product_id).name
+        order.product&.name
       end
       column "Product Price" do |order|
-        Product.find(order.product_id).price
+        order.product&.price
       end
       actions defaults: false do |product|
         item "View", admin_product_path(product), class: "view_link member_link"
@@ -81,7 +81,6 @@ ActiveAdmin.register Order do
             product.name
           end
         end
-
         column "Product Price" do |order|
           product = Product.find(order.product_id)
           business = product.business_id
@@ -96,7 +95,6 @@ ActiveAdmin.register Order do
       end
     end
   end
-
   show do
     if current_admin_user.admin?
       order_id = Order.find(params[:id])
@@ -117,7 +115,6 @@ ActiveAdmin.register Order do
       end
     else
       all_orders = Order.where(seller_id: current_admin_user.id)
-
       panel "Total buyers have purchased this product" do
         table_for all_orders do
           column "Name" do |order|
