@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const productId = el.dataset.productId;
 
-
     alert("Buying product with ID: " + productId);
   
     fetch(`/admin/products/${productId}/buy_product`, {
@@ -54,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(response => response.json())
     .then(data => alert(data.message));
   }
-
 
   function addToCard(el) {
 
@@ -74,4 +72,85 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(data => alert(data.message));
   }
 
-
+  document.addEventListener("DOMContentLoaded", function () {
+    function updateGrandTotal() {
+      let grandTotal = 0;
+      document.querySelectorAll("[id^='total-pay-']").forEach((totalElement) => {
+        grandTotal += parseFloat(totalElement.innerText);
+      });
+      const grandTotalEl = document.getElementById("grand-total");
+      if (grandTotalEl) {
+        grandTotalEl.innerText = grandTotal.toFixed(2);
+      }
+    }
+  
+    document.querySelectorAll(".increase-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        let productId = this.dataset.id;
+        let quantityElement = document.getElementById(`quantity-${productId}`);
+        let totalPriceElement = document.getElementById(`total-pay-${productId}`);
+        let pricePerUnit = parseFloat(totalPriceElement.dataset.price);
+  
+        let quantity = parseInt(quantityElement.innerText);
+        quantity += 1;
+        quantityElement.innerText = quantity;
+        totalPriceElement.innerText = (quantity * pricePerUnit).toFixed(2);
+  
+        updateGrandTotal();
+      });
+    });
+  
+    document.querySelectorAll(".decrease-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        let productId = this.dataset.id;
+        let quantityElement = document.getElementById(`quantity-${productId}`);
+        let totalPriceElement = document.getElementById(`total-pay-${productId}`);
+        let pricePerUnit = parseFloat(totalPriceElement.dataset.price);
+  
+        let quantity = parseInt(quantityElement.innerText);
+        if (quantity > 1) {
+          quantity -= 1;
+          quantityElement.innerText = quantity;
+          totalPriceElement.innerText = (quantity * pricePerUnit).toFixed(2);
+        }
+  
+        updateGrandTotal();
+      });
+    });
+  
+    updateGrandTotal();
+  });
+  
+  function cardAddBuyProduct(button) {
+    const productId = button.dataset.productId;
+    const quantity = parseInt(document.getElementById(`quantity-${productId}`).textContent);
+   console.log(productId)
+   console.log(quantity)
+    alert(`Buying product with ID: ${productId} and quantity: ${quantity}`);
+  
+    fetch(`/admin/products/${productId}/buy_product`, {
+      method: "POST",
+      headers: {
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        quantity: quantity
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+      return response.json(); 
+    })
+    .then(data => {
+      console.log("Buy successful:", data);
+      alert("Purchase successful!");
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("There was an error processing your purchase.");
+    });
+  }
+  

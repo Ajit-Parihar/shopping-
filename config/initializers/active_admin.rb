@@ -134,7 +134,7 @@ ActiveAdmin.setup do |config|
   # roots for each namespace.
   
   # Default:
-  config.root_to = 'home#index'
+  config.root_to = 'businesses#index'
 
   # == Admin Comments
   #
@@ -159,7 +159,7 @@ ActiveAdmin.setup do |config|
   # == Batch Actions
   #
   # Enable and disable Batch Actions
-  #
+  
   config.batch_actions = true
 
   # == Controller Filters

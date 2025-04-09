@@ -4,9 +4,11 @@ ActiveAdmin.register AdminUser do
   index do
     selectable_column
     id_column
+
     column "Name" do |user|
-    link_to "#{user.first_name} #{user.last_name}", admin_admin_user_path(user)
+      link_to "#{user.first_name} #{user.last_name}", admin_admin_user_path(user)
     end
+
     column :email
     column :user_type
   end
@@ -20,20 +22,20 @@ ActiveAdmin.register AdminUser do
       f.input :email
       f.input :password
       f.input :password_confirmation
-      f.input :user_type, as: :radio,
-      collection: [["seller", "seller"], ["user", "user"]],
-      label: "User Type"
+      f.input :user_type,
+              as: :radio,
+              collection: [["seller", "seller"], ["user", "user"]],
+              label: "User Type"
     end
     f.actions
   end
 
-  show do 
-      attributes_table do 
-        row :first_name
-        row :last_name
-        row :email
-        row :user_type
-      end
+  show do
+    attributes_table do
+      row :first_name
+      row :last_name
+      row :email
+      row :user_type
+    end
   end
-
 end

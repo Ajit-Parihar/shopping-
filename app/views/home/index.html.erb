@@ -1,0 +1,146 @@
+<style>
+  .custom-panel {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .custom-panel h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .custom-table th,
+  .custom-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .custom-table tr:hover {
+    background-color: #f9f9f9;
+  }
+
+  .custom-table img {
+    max-width: 100px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    margin: 2px;
+    border-radius: 5px;
+    transition: background 0.2s;
+  }
+
+  .tooltip:hover {
+    background-color: #45a049;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 4px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* above the button */
+    left: 50%;
+    margin-left: -50px;
+    width: 100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+
+</style>
+
+<div class="custom-panel">
+  <h3>Products</h3>
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Brand</th>
+        <th>Price</th>
+        <th>Image</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @products.each do |product| %>
+        <tr>
+          <td><%= product.name %></td>
+          <td><%= product.brand_name %></td>
+          <td><%= product.price %></td>
+          <td>
+            <% if product.image.attached? %>
+              <%= image_tag url_for(product.image), style: "max-width: 80px;" %>
+            <% else %>
+              <em>No image</em>
+            <% end %>
+          </td>
+          <td>
+            <button class="buy-button tooltip" data-product-id="<%= product.id %>" data-logged-in="<%= admin_user_signed_in? %>">
+              Buy
+              <span class="tooltiptext">Click to purchase</span>
+            </button>
+
+            <button class="cart-button tooltip" data-product-id="<%= product.id %>" data-logged-in="<%= admin_user_signed_in? %>">
+              Add to Cart
+              <span class="tooltiptext">Add this to your cart</span>
+            </button>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".buy-button, .cart-button").forEach(button => {
+      button.addEventListener("click", function () {
+        const isLoggedIn = this.dataset.loggedIn === "true";
+        const productId = this.dataset.productId;
+
+        console.log(this)
+
+        if (!isLoggedIn) {
+          alert("Please log in and sign up to perform this action.");
+          window.location.href = "/admin/login"; 
+        } else {
+          if (this.classList.contains("buy-button")) {
+            alert("Buying product ID: " + productId);
+          } else {
+            alert("Added product ID " + productId + " to cart");
+          }
+        }
+      });
+    });
+  });
+</script>
