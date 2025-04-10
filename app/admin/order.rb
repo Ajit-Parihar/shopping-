@@ -5,9 +5,11 @@ ActiveAdmin.register Order do
     def scoped_collection
       if current_admin_user.admin?
         Order.where(id: Order.select("MIN(id)").group(:product_id))
-      else
+      elsif current_admin_user.seller?
         seller_orders = Order.where(seller_id: current_admin_user.id)
         Order.where(id: seller_orders.select("MIN(id)").group(:product_id))
+      else
+          Order.where(user_id: current_admin_user.id).group(:product_id)
       end
     end
   end
@@ -46,55 +48,64 @@ ActiveAdmin.register Order do
          },
          label: "Business Name"
 
-  index do |res|
-    paramsbusiness = params[:business_id]
-    flag = false
+         index do 
+           selectable_column
+             column "Product Name" do |order|
+                order.product&.name
+             end
 
-    orders.each do |order|
-      product = Product.find(order.product.id)
-      if paramsbusiness.nil? || paramsbusiness.to_i == product.business_id
-        flag = true
-      end
-    end
+             column "Product Price" do |order|
+              number_to_currency(order.product&.price, unit: "₹", precision: 0)
+            end 
 
-    if current_admin_user.admin?
-      selectable_column
-      column "Product Name" do |order|
-        order.product&.name
-      end
-      column "Product Price" do |order|
-        order.product&.price
-      end
-      actions defaults: false do |product|
-        item "View", admin_product_path(product), class: "view_link member_link"
-      end
-    else
-      if flag
-        selectable_column
-        column "Product Name" do |order|
-          product = Product.find(order.product_id)
-          business = product.business_id
+            actions defaults: false do |order|
+              link_to 'View', resource_path(order)
+            end
+         end
 
-          if paramsbusiness.to_i == business
-            product.name
-          elsif paramsbusiness.nil? && order.seller_id == current_admin_user.id
-            product.name
-          end
-        end
-        column "Product Price" do |order|
-          product = Product.find(order.product_id)
-          business = product.business_id
+  # index do |res|
+  #   paramsbusiness = params[:business_id]
+  #   flag = false
+  #   orders.each do |order|
+  #     product = Product.find(order.product.id)start_time
 
-          if paramsbusiness.to_i == business
-            product.price
-          elsif paramsbusiness.nil? && order.seller_id == current_admin_user.id
-            product.price
-          end
-        end
-        actions
-      end
-    end
-  end
+  #   if current_admin_user.admin?
+  #     selectable_column
+  #     column "Product Name" do |order|
+  #       order.product&.name
+  #     end
+  #     column "Product Price" do |order|
+  #       order.product&.price
+  #     end
+  #     actions defaults: false do |product|
+  #       item "View", admin_product_path(product), class: "view_link member_link"
+  #     end
+  #   else
+  #     if flag
+  #       selectable_column
+  #       column "Product Name" do |order|
+  #         product = Product.find(order.product_id)
+  #         business = product.business_id
+
+  #         if paramsbusiness.to_i == business
+  #           product.name
+  #         elsif paramsbusiness.nil? && order.seller_id == current_admin_user.id
+  #           product.name
+  #         end
+  #       end
+  #       column "Product Price" do |order|
+  #         product = Product.find(order.product_id)
+  #         business = product.business_id
+  #         if paramsbusiness.to_i == business
+  #           product.price
+  #         elsif paramsbusiness.nil? && order.seller_id == current_admin_user.id
+  #           product.price
+  #         end
+  #       end
+  #       actions
+  #     end
+  #   end
+  # end
   show do
     if current_admin_user.admin?
       order_id = Order.find(params[:id])
@@ -102,18 +113,18 @@ ActiveAdmin.register Order do
 
       panel "Total buyers have purchased this product" do
         table_for all_orders do
-          column "User" do |order|
-            order.user.email
+          column "Buyer" do |order|
+            order.user.first_name
           end
           column "Ordered At" do |order|
             order.created_at.strftime("%B %d, %Y %H:%M")
           end
           column "Seller" do |order|
-            order.seller.email
+            order.seller.first_name
           end
         end
       end
-    else
+    elsif current_admin_user.seller?
       all_orders = Order.where(seller_id: current_admin_user.id)
       panel "Total buyers have purchased this product" do
         table_for all_orders do
@@ -127,6 +138,32 @@ ActiveAdmin.register Order do
             order.created_at.strftime("%B %d, %Y %H:%M")
           end
         end
+      end
+    else
+      order_id = Order.find(params[:id])
+      all_orders = Order.where(product_id: order_id.product_id,user_id: current_admin_user.id)
+
+      panel "Total buyers have purchased this product" do
+        table_for all_orders do
+          column "Buyer" do |order|
+            order.user.first_name
+          end
+          column "Ordered At" do |order|
+            order.created_at.strftime("%B %d, %Y %H:%M")
+          end
+          column "Seller" do |order|
+            order.seller.first_name
+          end
+          column "deliver status" do |order|
+            order.deliver
+          end
+          column "Order Confirm" do |order|
+            order.pending
+          end
+          end
+          div style: "margin-top: 20px;" do
+            link_to "cancle ",  admin_orders_path(order), class: "button primary" 
+          end
       end
     end
   end

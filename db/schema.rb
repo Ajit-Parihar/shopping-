@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_125237) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_10_062338) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -93,6 +93,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_125237) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "business_id", null: false
+    t.boolean "deliver"
+    t.boolean "pending"
+    t.boolean "cancel"
     t.index ["business_id"], name: "index_orders_on_business_id"
     t.index ["product_id"], name: "index_orders_on_product_id"
     t.index ["seller_id"], name: "index_orders_on_seller_id"
@@ -106,6 +109,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_125237) do
     t.datetime "updated_at", null: false
     t.bigint "business_id", null: false
     t.integer "price"
+    t.string "discription"
     t.index ["business_id"], name: "index_products_on_business_id"
   end
 
@@ -119,6 +123,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_125237) do
     t.index ["seller_id"], name: "index_seller_products_on_seller_id"
   end
 
+  create_table "user_addresses", force: :cascade do |t|
+    t.string "country"
+    t.string "state"
+    t.string "dist"
+    t.string "block"
+    t.string "town"
+    t.integer "gali_no"
+    t.integer "house_no"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_user_addresses_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "add_to_cards", "admin_users"
@@ -127,4 +145,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_125237) do
   add_foreign_key "orders", "admin_users", column: "seller_id"
   add_foreign_key "orders", "businesses"
   add_foreign_key "products", "businesses"
+  add_foreign_key "user_addresses", "admin_users", column: "user_id"
 end

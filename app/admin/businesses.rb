@@ -62,12 +62,11 @@ ActiveAdmin.register Business do
         "No image available"
       end
     end
-
+    unless current_admin_user.user?
     column "Orders" do |business|
-      if can?(:read, Order)
         link_to "View Orders", admin_orders_path(business_id: business.id)
-      end
     end
+  end
 
     column "" do |business|
       content_tag(:span, "", class: "row-link", data: { href: admin_business_path(business) })
@@ -76,53 +75,24 @@ ActiveAdmin.register Business do
     actions
   end
 
-  show do |business|
-    user_seller = AdminUser.find(business.seller_id)
-    seller = "#{user_seller.first_name} #{user_seller.last_name}"
-
-    div class: "business-header" do
-      attributes_table_for business do
-        row :seller do
-          seller
-        end
-        row :category
-        row :image do |b|
-          category = b.category
-          image_url = Rails.application.config.images_hash[category.to_sym] if Rails.application.config.images_hash.key?(category.to_sym)
-
-          if image_url
-            image_tag image_url, alt: "#{category} Image", class: "header-image"
-          else
-            "No image available"
-          end
-        end
-      end
-    end
-
+  show  do
     panel "Products", class: "fade-in-section" do
       products = Product
                    .where(business_id: business.id)
                    .select("name, MAX(id) AS id, MAX(price) AS price, MAX(brand_name) AS brand_name")
                    .group(:name)
-
-      table_for products do
+    
+      table_for products, class: "clickable-table" do
+        column :id
         column :name
         column :price
         column :brand_name
-
+    
         column :image do |product|
           if product.image.attached?
-            image_tag url_for(product.image), alt: product.name, style: 'max-width: 300px;', class: "product-thumb", onclick: "highlightImage(this)"
+            image_tag url_for(product.image), alt: product.name, style: 'max-width: 300px;', class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
           else
             "No image"
-          end
-        end
-
-        if current_admin_user.user?
-          column "Actions" do |product|
-            span link_to "Buy", "#", class: "button buy-button", data: { product_id: product.id }, onclick: "buyProduct(this)"
-            span " "
-            span link_to "Add to Cart", admin_addtocard_path(product_id: product), class: "button cart-button"
           end
         end
       end

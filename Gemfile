@@ -72,3 +72,6 @@ gem "cancancan"
 
 gem 'chartkick'
 
+gem 'country_select'
+
+

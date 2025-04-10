@@ -37,22 +37,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  function buyProduct(el) {
+  // function buyProduct(el) {
 
-    const productId = el.dataset.productId;
+  //   const productId = el.dataset.productId;
 
-    alert("Buying product with ID: " + productId);
+  //   alert("Buying product with ID: " + productId);
   
-    fetch(`/admin/products/${productId}/buy_product`, {
-      method: "POST",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        "Content-Type": "application/json"
-      }
-    })
-    .then(response => response.json())
-    .then(data => alert(data.message));
-  }
+  //   fetch(`/admin/products/${productId}/buy_product`, {
+  //     method: "POST",
+  //     headers: {
+  //       "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+  //       "Content-Type": "application/json"
+  //     }
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => alert(data.message));
+  // }
 
   function addToCard(el) {
 
@@ -124,9 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cardAddBuyProduct(button) {
     const productId = button.dataset.productId;
     const quantity = parseInt(document.getElementById(`quantity-${productId}`).textContent);
-   console.log(productId)
-   console.log(quantity)
-    alert(`Buying product with ID: ${productId} and quantity: ${quantity}`);
+
   
     fetch(`/admin/products/${productId}/buy_product`, {
       method: "POST",
@@ -146,11 +144,34 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(data => {
       console.log("Buy successful:", data);
-      alert("Purchase successful!");
+    
+      const anim = document.getElementById("order-animation");
+      if (anim) {
+        anim.style.display = "flex";
+      }
+      //  window.location.href = `/admin/buy?product_id=${productId}&status=true`
+      setTimeout(() => {
+        window.location.href = "/admin/orders";
+      }, 2000);
     })
     .catch(error => {
       console.error("Error:", error);
-      alert("There was an error processing your purchase.");
+      alert("please add address then continue");
+
+      window.location.href = `/admin/buy?product_id=${productId}&status=false`;
     });
+
   }
-  
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".clickable-table tbody tr").forEach(function (row) {
+    row.addEventListener("click", function () {
+      console.log(row.querySelector("td:first-child"));
+      const productId = row.querySelector("td:first-child").textContent.trim();
+      console.log(productId)
+      if (productId) {
+        window.location.href = "/admin/displayproduct?product_id=" + encodeURIComponent(productId);
+      }
+    });
+  });
+});

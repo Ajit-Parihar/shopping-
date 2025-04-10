@@ -13,8 +13,13 @@ class Ability
 
      else 
       can :manage, ActiveAdmin::Page, :name => "AddToCard"
+      can :manage, ActiveAdmin::Page, :name => "Buy"
+      can :manage, ActiveAdmin::Page, :name => "DisplayProduct"
       can :read, Business
-      cannot :read, Order
+      can :manage, UserAddress
+      can :read, Order
+      can :read, Product
+
      end
   end
 end

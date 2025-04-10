@@ -1,4 +1,6 @@
 ActiveAdmin.register Product do
+
+  
   remove_filter :image_attachment, :image_blob
 
   permit_params :name, :price, :brand_name, :image, :business_id
@@ -25,25 +27,30 @@ ActiveAdmin.register Product do
   }, label: "Business Name"
 
   controller do
-    def create
-      super do |success, failure|
-        success.html do
-          SellerProduct.create!(
-            product_id: resource.id,
-            seller_id: current_admin_user.id
-          )
-          redirect_to admin_products_path and return
-        end
-        failure.html { render :new }
-      end
-    end
+ 
+  #   def create
+  #     super do |success, failure|
+  #       success.html do
+  #         SellerProduct.create!(
+  #           product_id: resource.id,
+  #           seller_id: current_admin_user.id
+  #         )
+  #         redirect_to admin_products_path and return
+  #       end
+  #       failure.html { render :new }
+  #     end
+  #   end
 
     def scoped_collection
       if current_admin_user.admin?
+        
         Product.all
-      else
+      elsif current_admin_user.seller?
         seller_product_ids = SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id)
+        puts seller_product_ids.inspect
         Product.where(id: seller_product_ids)
+      else
+          Product.all
       end
     end
   end
@@ -75,6 +82,7 @@ ActiveAdmin.register Product do
 
   show do
     item = params[:id].to_i
+
     unless SellerProduct.find_by(product_id: item)
       SellerProduct.create(seller_id: current_admin_user.id, product_id: item)
     end
@@ -92,33 +100,33 @@ ActiveAdmin.register Product do
       row :brand_name
     end
 
-    orders = Order.where(product_id: product.id)
+    # orders = Order.where(product_id: product.id)
+    # panel "Buyers" do
+    #   table_for orders do
 
-    panel "Buyers" do
-      table_for orders do
-       
-        column "Name" do |order|
-          order.user.first_name + " " + order.user.last_name
-        end
+    #     column "Name" do |order|
+    #       order.user.first_name + " " + order.user.last_name
+    #     end
 
-        column "User" do |order|
-          order.user.email
-        end
-        column "Ordered At" do |order|
-          order.created_at.strftime("%B %d, %Y %H:%M")
-        end
-      end
-    end
+    #     column "User" do |order|
+    #       order.user.email
+    #     end
+    #     column "Ordered At" do |order|
+    #       order.created_at.strftime("%B %d, %Y %H:%M")
+    #     end
+    #   end
+    # end
   end
 
   member_action :buy_product, method: :post do
+
+    if UserAddress.find_by(user_id: current_admin_user.id)
+
     quantity = params[:quantity].to_i
 
     product = Product.find(params[:id])
     seller_product = SellerProduct.find_by(product_id: product.id)
-    order = Order.create(user_id: current_admin_user.id, product_id: product.id, seller_id: seller_product.seller_id, business_id: product.business_id)
-    puts "working"
-    puts order.inspect
+    order = Order.create(user_id: current_admin_user.id, product_id: product.id, seller_id: seller_product.seller_id, business_id: product.business_id, deliver: false, cancel: false, pending: true)
     order.save
     if seller_product
       current_sold_count = seller_product.sold_count || 0
@@ -129,4 +137,5 @@ ActiveAdmin.register Product do
       render json: { error: "SellerProduct not found for this product." }, status: :not_found
     end
   end
+ end
 end
