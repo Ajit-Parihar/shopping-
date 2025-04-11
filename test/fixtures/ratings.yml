@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  comments: MyString
+  rate: 1
+  admin_user: one
+  product: one
+
+two:
+  comments: MyString
+  rate: 1
+  admin_user: two
+  product: two

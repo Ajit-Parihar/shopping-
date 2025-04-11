@@ -17,8 +17,9 @@ class Ability
       can :manage, ActiveAdmin::Page, :name => "DisplayProduct"
       can :read, Business
       can :manage, UserAddress
-      can :read, Order
       can :read, Product
+      can :read, Order, user_id: user.id
+      can :manage, Rating
 
      end
   end

@@ -37,23 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // function buyProduct(el) {
-
-  //   const productId = el.dataset.productId;
-
-  //   alert("Buying product with ID: " + productId);
-  
-  //   fetch(`/admin/products/${productId}/buy_product`, {
-  //     method: "POST",
-  //     headers: {
-  //       "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-  //       "Content-Type": "application/json"
-  //     }
-  //   })
-  //   .then(response => response.json())
-  //   .then(data => alert(data.message));
-  // }
-
   function addToCard(el) {
 
     const productId = el.dataset.productId;
@@ -149,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (anim) {
         anim.style.display = "flex";
       }
-      //  window.location.href = `/admin/buy?product_id=${productId}&status=true`
       setTimeout(() => {
         window.location.href = "/admin/orders";
       }, 2000);
@@ -175,3 +157,42 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+function cancelOrder(cancel) {
+  const orderId = cancel.dataset.id;
+
+  if (confirm("Are you sure you want to cancel your order?")) {
+    alert("Cancelling order ID: " + orderId);
+
+    fetch(`/admin/orders/${orderId}/cancel_order`, {
+      method: "POST",
+      headers: {
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "Content-Type": "application/json"
+      },
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+      window.location.href = `/admin/orders/${orderId}`
+      return response.json(); 
+    })
+ 
+    .catch(error => {
+      console.error("Cancel failed:", error);
+      alert("Something went wrong while cancelling the order.");
+    });
+
+  } else {
+    alert("Order cancellation aborted.");
+  }
+}
+
+function productRating(rating){
+   console.log(rating)
+   
+   const orderId = rating.dataset.id
+   window.location.href = `/admin/ratings/new?order_id=${orderId}`
+}
+

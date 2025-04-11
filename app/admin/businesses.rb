@@ -1,5 +1,5 @@
 ActiveAdmin.register Business do
-  permit_params :category, :seller_id, :create_at, :updated_at
+  permit_params :category, :seller_id, :create_at, :updated_at 
 
   menu label: proc {
     if current_admin_user.seller?
@@ -75,18 +75,20 @@ ActiveAdmin.register Business do
     actions
   end
 
-  show  do
+  show  do 
     panel "Products", class: "fade-in-section" do
       products = Product
                    .where(business_id: business.id)
-                   .select("name, MAX(id) AS id, MAX(price) AS price, MAX(brand_name) AS brand_name")
                    .group(:name)
+                   puts "working good"
+                   puts products.inspect
     
       table_for products, class: "clickable-table" do
         column :id
         column :name
         column :price
         column :brand_name
+        column :rating
     
         column :image do |product|
           if product.image.attached?
@@ -95,6 +97,7 @@ ActiveAdmin.register Business do
             "No image"
           end
         end
+         
       end
     end
   end

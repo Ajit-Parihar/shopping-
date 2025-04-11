@@ -3,7 +3,7 @@ ActiveAdmin.register Product do
   
   remove_filter :image_attachment, :image_blob
 
-  permit_params :name, :price, :brand_name, :image, :business_id
+  permit_params :name, :price, :brand_name, :image, :business_id, :rating
 
   form do |f|
     f.inputs "Product Details" do
@@ -28,19 +28,6 @@ ActiveAdmin.register Product do
 
   controller do
  
-  #   def create
-  #     super do |success, failure|
-  #       success.html do
-  #         SellerProduct.create!(
-  #           product_id: resource.id,
-  #           seller_id: current_admin_user.id
-  #         )
-  #         redirect_to admin_products_path and return
-  #       end
-  #       failure.html { render :new }
-  #     end
-  #   end
-
     def scoped_collection
       if current_admin_user.admin?
         

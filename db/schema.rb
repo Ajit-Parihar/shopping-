@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_10_062338) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_11_103555) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -110,7 +110,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_10_062338) do
     t.bigint "business_id", null: false
     t.integer "price"
     t.string "discription"
+    t.decimal "rating", precision: 2, scale: 1
     t.index ["business_id"], name: "index_products_on_business_id"
+  end
+
+  create_table "ratings", force: :cascade do |t|
+    t.string "comments"
+    t.integer "rate"
+    t.integer "admin_user_id", null: false
+    t.integer "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_user_id"], name: "index_ratings_on_admin_user_id"
+    t.index ["product_id"], name: "index_ratings_on_product_id"
   end
 
   create_table "seller_products", force: :cascade do |t|
@@ -145,5 +157,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_10_062338) do
   add_foreign_key "orders", "admin_users", column: "seller_id"
   add_foreign_key "orders", "businesses"
   add_foreign_key "products", "businesses"
+  add_foreign_key "ratings", "admin_users"
+  add_foreign_key "ratings", "products"
   add_foreign_key "user_addresses", "admin_users", column: "user_id"
 end
