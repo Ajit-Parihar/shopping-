@@ -8,3 +8,8 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 # AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
+images_hash = Rails.application.config.images_hash
+
+images_hash.each do |category, _image_url|
+  Business.find_or_create_by!(category: category.to_s)
+end

@@ -6,6 +6,6 @@ class Order < ApplicationRecord
 
 
   def delivered?
-    Time.current > created_at + 3.days
+    Time.current > created_at + 3.minutes
   end
 end

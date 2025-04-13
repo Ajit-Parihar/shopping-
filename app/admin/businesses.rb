@@ -1,5 +1,5 @@
 ActiveAdmin.register Business do
-  permit_params :category, :seller_id, :create_at, :updated_at 
+  permit_params :category, :create_at, :updated_at 
 
   menu label: proc {
     if current_admin_user.seller?
@@ -12,43 +12,45 @@ ActiveAdmin.register Business do
   }
 
   scope :all, default: true
-  scope("With User") { |businesses| businesses.where.not(seller_id: nil) }
+  # scope("With User") { |businesses| businesses.where.not(seller_id: nil) }
 
-  form do |f|
-    f.inputs "Business Details" do
-      f.input :category,
-              as: :radio,
-              collection: Rails.application.config.images_hash.keys,
-              label: "Product Category"
-
-      f.input :seller_id,
-              input_html: { value: current_admin_user.id, readonly: true }
-    end
-    f.actions
-  end
+  # form do |f|
+  #   f.inputs "Business Details" do
+  #     f.input :category,
+  #             as: :radio,
+  #             collection: Rails.application.config.images_hash.keys,
+  #             label: "Product Category"
+  #   end
+  #   f.actions
+  # end
 
   controller do
     def scoped_collection
-      if current_admin_user.admin? || current_admin_user.user?
-        Business.all
+      if current_admin_user.admin? || current_admin_user.user?       
+       Business.joins(:products).distinct
       else
-        Business.where(seller_id: current_admin_user)
-      end
-    end
+      
+        Business.joins(:products)
+        .joins("INNER JOIN seller_products ON seller_products.business_id = businesses.id")
+        .where(seller_products: { seller_id: current_admin_user.id })
+        .distinct
+       end
+     end
   end
 
   filter :category
-  filter :seller_id,
-         as: :select,
-         collection: -> {
-           AdminUser.where(user_type: 'seller').map { |u| [u.email, u.id] }
-         }
+  # filter :seller_id,
+  #        as: :select,
+  #        collection: -> {
+  #          AdminUser.where(user_type: 'seller').map { |u| [u.email, u.id] }
+  #        }
 
   index row_class: -> (business) { "clickable-row" } do
+    
     selectable_column
     id_column
 
-    column :seller
+    # column :seller
     column :category
     column :created_at
 
@@ -71,34 +73,29 @@ ActiveAdmin.register Business do
     column "" do |business|
       content_tag(:span, "", class: "row-link", data: { href: admin_business_path(business) })
     end
-
     actions
   end
 
   show  do 
-    panel "Products", class: "fade-in-section" do
-      products = Product
-                   .where(business_id: business.id)
-                   .group(:name)
-                   puts "working good"
-                   puts products.inspect
-    
-      table_for products, class: "clickable-table" do
-        column :id
-        column :name
-        column :price
-        column :brand_name
-        column :rating
-    
-        column :image do |product|
-          if product.image.attached?
-            image_tag url_for(product.image), alt: product.name, style: 'max-width: 300px;', class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
-          else
-            "No image"
+      panel "Products", class: "fade-in-section" do
+        business_id = params[:id]
+        products = Product.where(business_id: business_id)
+
+        table_for products, class: "clickable-table" do
+          column :id
+          column :name
+          column :price
+          column :brand_name
+          column :rating
+      
+          column :image do |product|
+            if product.image.attached?
+              image_tag url_for(product.image), alt: product.name, style: 'max-width: 300px;', class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
+            else
+              "No image"
+            end
           end
         end
-         
-      end
     end
   end
 end

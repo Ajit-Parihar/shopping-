@@ -14,7 +14,7 @@ ActiveAdmin.register Order do
         puts 'working orders '
        
         unless order == nil
-        redirect_to admin_order_path(order.id)  #some change are needed
+        redirect_to admin_order_path(order.id)  
         else
           redirect_to admin_root_path, alert: "You have not purchased anything on this platform."
 
@@ -80,11 +80,7 @@ ActiveAdmin.register Order do
              column "Product Price" do |order|
               number_to_currency(order.product&.price, unit: "₹", precision: 0)
             end 
-
-            # actions defaults: false do |order|
-            #   link_to 'View', resource_path(order)
-            # end
-            
+         
             actions
         end
 
@@ -151,17 +147,26 @@ ActiveAdmin.register Order do
           end
 
            column "rating" do |order|
-            if resource.delivered? && order.cancel == false
-
+             rating = Rating.find_by(admin_user_id: order.user)
+             puts rating.inspect
+            if resource.delivered? && order.cancel == false 
               link_to "Add Rating", "#", onclick: "productRating(this)", class: "button primary", data: { id: order.id }           
-             end
+            else
+              # rating.rate
+            end
           end
           column "Cancel Order" do |order|
             unless order.delivered? || order.cancel
               link_to "Cancel", "#", onclick: "cancelOrder(this)", class: "button primary", data: { id: order.id }           
-             end
+            else
+                  link_to "Cancel", "#", class: "button primary", style: "opacity: 0.5;" 
+            end
           end
         end
+      end
+      div do
+        span "Track this order:"
+        span link_to "Show", admin_ordertracker_path, class: "button"
       end
     end
   end

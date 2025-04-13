@@ -7,9 +7,10 @@ class Ability
        can :manage, :all
 
      elsif user.user_type == "seller"
-      can :manage, Business
+      can :read, Business
       can :manage, Product
       can :manage, Order
+      can :manage, ActiveAdmin::Page, :name => "DisplayProduct"
 
      else 
       can :manage, ActiveAdmin::Page, :name => "AddToCard"
@@ -20,7 +21,7 @@ class Ability
       can :read, Product
       can :read, Order, user_id: user.id
       can :manage, Rating
-
+      can :manage, ActiveAdmin::Page, :name => "OrderTracker"
      end
   end
 end

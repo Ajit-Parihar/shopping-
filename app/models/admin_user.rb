@@ -6,12 +6,12 @@ class AdminUser < ApplicationRecord
   devise :database_authenticatable, 
          :recoverable, :rememberable, :validatable
 
-   has_many :businesses, foreign_key: "seller_id", dependent: :destroy
    has_one :seller_product, foreign_key: "seller_id", dependent: :destroy
    has_many :orders_as_user, class_name: 'Order', foreign_key: 'user_id'
    has_many :orders_as_seller, class_name: 'Order', foreign_key: 'seller_id'
    has_many :user_addresses
    has_many :ratings
+   has_many :order_trackers
 
 
   validates :password, :presence => true, :format => {:with => /\A[a-z0-9A-Z_@]{8,30}\Z/, message: :not_valid}, on: :create

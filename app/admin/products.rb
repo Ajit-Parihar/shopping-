@@ -1,9 +1,21 @@
 ActiveAdmin.register Product do
 
-  
   remove_filter :image_attachment, :image_blob
 
-  permit_params :name, :price, :brand_name, :image, :business_id, :rating
+  permit_params :name, :price, :brand_name,  :image, :business_id, :rating, :seller_id
+
+  controller do
+    def scoped_collection
+      if current_admin_user.admin?
+        Product.all
+      elsif current_admin_user.seller?
+        # products = Product.where(id: SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id))
+        Product.all
+      else
+        Product.all
+      end
+    end
+  end
 
   form do |f|
     f.inputs "Product Details" do
@@ -16,31 +28,26 @@ ActiveAdmin.register Product do
     f.actions
   end
 
+  controller do
+    def create
+      super do |format|
+        product = resource
+         SellerProduct.create(seller_id: current_admin_user.id, product_id: product.id, business_id: product.business_id)
+        end
+      end
+  end
+
   filter :name
   filter :brand_name
-  filter :business, as: :select, collection: -> {
-    if current_admin_user.admin?
-      Business.all.map { |b| [b.category, b.id] }
-    else
-      Business.where(seller_id: current_admin_user.id).map { |b| ["Business (#{b.category})", b.id] }
-    end
-  }, label: "Business Name"
+  # filter :business, as: :select, collection: -> {
+  #   if current_admin_user.admin?
+  #     Business.all.map { |b| [b.category, b.id] }
+  #   else
+  #     Business.where(seller_id: current_admin_user.id).map { |b| ["Business (#{b.category})", b.id] }
+  #   end
+  # }, label: "Business Name"
 
-  controller do
- 
-    def scoped_collection
-      if current_admin_user.admin?
-        
-        Product.all
-      elsif current_admin_user.seller?
-        seller_product_ids = SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id)
-        puts seller_product_ids.inspect
-        Product.where(id: seller_product_ids)
-      else
-          Product.all
-      end
-    end
-  end
+  
 
   index row_class: ->(product) { "clickable-row" } do
     selectable_column
@@ -70,9 +77,9 @@ ActiveAdmin.register Product do
   show do
     item = params[:id].to_i
 
-    unless SellerProduct.find_by(product_id: item)
-      SellerProduct.create(seller_id: current_admin_user.id, product_id: item)
-    end
+    # unless SellerProduct.find_by(product_id: item)
+    #   SellerProduct.create(seller_id: current_admin_user.id, product_id: item)
+    # end
 
     attributes_table do
       row :image do |product|
@@ -87,22 +94,25 @@ ActiveAdmin.register Product do
       row :brand_name
     end
 
-    # orders = Order.where(product_id: product.id)
-    # panel "Buyers" do
-    #   table_for orders do
+    rating = Rating.where(product_id: product.id)
 
-    #     column "Name" do |order|
-    #       order.user.first_name + " " + order.user.last_name
-    #     end
-
-    #     column "User" do |order|
-    #       order.user.email
-    #     end
-    #     column "Ordered At" do |order|
-    #       order.created_at.strftime("%B %d, %Y %H:%M")
-    #     end
-    #   end
-    # end
+    panel "Reviews&Ratings" do 
+      table_for rating do
+       column "Buyer" do |rating|
+          rating.admin_user.first_name
+       end
+       column "Images" do |rating|
+         div do
+           rating.photos.each do |photo|
+             span image_tag(url_for(photo), style: "max-width: 100px; margin-right: 10px;")
+           end
+         end
+       end
+          column :rate
+          column :comments
+          column :created_at
+      end
+   end
   end
 
   member_action :buy_product, method: :post do

@@ -11,7 +11,7 @@ ActiveAdmin.register_page "DisplayProduct" do
               image_tag(product.image, style: "max-width: 100px;")
             end
             column :name
-
+            
             column :brand_name
 
             column "Price" do |product|

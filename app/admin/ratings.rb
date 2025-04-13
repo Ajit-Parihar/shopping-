@@ -1,4 +1,5 @@
 ActiveAdmin.register Rating do
+  menu false
   remove_filter :photos_attachments, :photos_blob
 
   permit_params :comments, :rate, :admin_user_id, :product_id, photos: []
@@ -14,7 +15,6 @@ ActiveAdmin.register Rating do
           @rating.admin_user_id = order.user_id
         end
       end
-
       super
     end
 
