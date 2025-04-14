@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_13_164705) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_14_085002) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -84,15 +84,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_164705) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "order_trackers", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.decimal "total_price"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "status", default: 0
-    t.index ["user_id"], name: "index_order_trackers_on_user_id"
-  end
-
   create_table "orders", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "product_id", null: false
@@ -100,9 +91,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_164705) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "business_id", null: false
-    t.boolean "deliver"
-    t.boolean "pending"
-    t.boolean "cancel"
+    t.string "status_type", default: "ordered"
     t.index ["business_id"], name: "index_orders_on_business_id"
     t.index ["product_id"], name: "index_orders_on_product_id"
     t.index ["seller_id"], name: "index_orders_on_seller_id"
@@ -128,7 +117,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_164705) do
     t.integer "product_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "order_id", null: false
     t.index ["admin_user_id"], name: "index_ratings_on_admin_user_id"
+    t.index ["order_id"], name: "index_ratings_on_order_id"
     t.index ["product_id"], name: "index_ratings_on_product_id"
   end
 
@@ -162,11 +153,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_164705) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "add_to_cards", "admin_users"
   add_foreign_key "add_to_cards", "products"
-  add_foreign_key "order_trackers", "admin_users", column: "user_id"
   add_foreign_key "orders", "admin_users", column: "seller_id"
   add_foreign_key "orders", "businesses"
   add_foreign_key "products", "businesses"
   add_foreign_key "ratings", "admin_users"
+  add_foreign_key "ratings", "orders"
   add_foreign_key "ratings", "products"
   add_foreign_key "seller_products", "businesses"
   add_foreign_key "user_addresses", "admin_users", column: "user_id"

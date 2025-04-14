@@ -11,12 +11,13 @@ ActiveAdmin.register AdminUser do
 
     column :email
     column :user_type
+    
   end
 
   filter :email
 
   form do |f|
-    f.inputs do
+    f.inputs "Admin User Details" do
       f.input :first_name
       f.input :last_name
       f.input :email
@@ -24,7 +25,7 @@ ActiveAdmin.register AdminUser do
       f.input :password_confirmation
       f.input :user_type,
               as: :radio,
-              collection: [["seller", "seller"], ["user", "user"]],
+              collection: [["Seller", "seller"], ["User", "user"]],
               label: "User Type"
     end
     f.actions

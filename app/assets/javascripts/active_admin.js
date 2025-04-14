@@ -108,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const productId = button.dataset.productId;
     const quantity = parseInt(document.getElementById(`quantity-${productId}`).textContent);
 
-  
     fetch(`/admin/products/${productId}/buy_product`, {
       method: "POST",
       headers: {
@@ -132,9 +131,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (anim) {
         anim.style.display = "flex";
       }
-      setTimeout(() => {
+     
         window.location.href = "/admin/orders";
-      }, 2000);
+   
     })
     .catch(error => {
       console.error("Error:", error);
@@ -195,4 +194,5 @@ function productRating(rating){
    const orderId = rating.dataset.id
    window.location.href = `/admin/ratings/new?order_id=${orderId}`
 }
+
 

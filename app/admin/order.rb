@@ -1,5 +1,4 @@
 ActiveAdmin.register Order do
-  
   permit_params :user_id, :product_id, :seller_id, :business_id
 
   if proc { current_admin_user.admin? || current_admin_user.seller? }
@@ -7,14 +6,14 @@ ActiveAdmin.register Order do
   else
     actions :show
   end
+
   controller do
     def index
       unless current_admin_user.admin? || current_admin_user.seller?
         order = Order.find_by(user_id: current_admin_user.id)
-        puts 'working orders '
-       
+
         unless order == nil
-        redirect_to admin_order_path(order.id)  
+        redirect_to admin_order_path(order.id)
         else
           redirect_to admin_root_path, alert: "You have not purchased anything on this platform."
 
@@ -25,7 +24,6 @@ ActiveAdmin.register Order do
     end
 
     def scoped_collection
-
       if current_admin_user.admin?
         Order.where(id: Order.select("MIN(id)").group(:product_id))
       elsif current_admin_user.seller?
@@ -59,33 +57,21 @@ ActiveAdmin.register Order do
     f.actions
   end
 
-  filter :business,
-         as: :select,
-         collection: -> {
-           if current_admin_user.admin?
-             Business.all.map { |b| [ b.category, b.id ] }
-           else
-             Business.where(seller_id: current_admin_user.id)
-                     .map { |b| [ "Business (#{b.category})", b.id ] }
-           end
-         },
-         label: "Business Name"
 
-         index do 
-           selectable_column 
-             column "Product Name" do |order|
-                order.product&.name
-             end
+  index do
+    selectable_column
+      column "Product Name" do |order|
+        order.product&.name
+      end
 
-             column "Product Price" do |order|
-              number_to_currency(order.product&.price, unit: "₹", precision: 0)
-            end 
-         
-            actions
-        end
+      column "Product Price" do |order|
+      number_to_currency(order.product&.price, unit: "₹", precision: 0)
+    end
+    actions
+  end
 
   show do
-    if current_admin_user.admin?
+     if current_admin_user.admin?
       order_id = Order.find(params[:id])
       all_orders = Order.where(product_id: order_id.product_id)
 
@@ -100,9 +86,12 @@ ActiveAdmin.register Order do
           column "Seller" do |order|
             order.seller.first_name
           end
+          column "Product" do |order|
+            image_tag(order.product.image, style: "max-width: 300px;", class: "product-thumb", onclick: "highlightImage(this)")
+         end
         end
       end
-    elsif current_admin_user.seller?
+     elsif current_admin_user.seller?
       all_orders = Order.where(seller_id: current_admin_user.id)
       panel "Total buyers have purchased this product" do
         table_for all_orders do
@@ -115,10 +104,13 @@ ActiveAdmin.register Order do
           column "Ordered At" do |order|
             order.created_at.strftime("%B %d, %Y %H:%M")
           end
+          column "Product" do |order|
+              image_tag(order.product.image, style: "max-width: 300px;", class: "product-thumb", onclick: "highlightImage(this)")
+          end
         end
       end
-    else
-      
+     else
+
       all_orders = Order.where(user_id: current_admin_user.id)
       panel "Total buyers have purchased this product" do
         table_for all_orders do
@@ -134,46 +126,40 @@ ActiveAdmin.register Order do
           column "Seller" do |order|
             order.seller.first_name
           end
-         
+
           column "deliver status" do |order|
-            if order.cancel == false
-              order.delivered?
-            else
-               "Order is Cancel"
-            end
-          end
-          column "Order Confirm" do |order|
-            order.pending
+               order.status_type
           end
 
            column "rating" do |order|
-             rating = Rating.find_by(admin_user_id: order.user)
-             puts rating.inspect
-            if resource.delivered? && order.cancel == false 
-              link_to "Add Rating", "#", onclick: "productRating(this)", class: "button primary", data: { id: order.id }           
-            else
-              # rating.rate
+             rating = Rating.find_by(order_id: order)
+             puts "working good"
+             puts resource.inspect
+            if rating == nil && order.status_type == "delivered"
+              link_to "Add Rating", "#", onclick: "productRating(this)", class: "button primary", data: { id: order.id }
+            end
+              unless rating == nil
+                rating.rate
             end
           end
           column "Cancel Order" do |order|
-            unless order.delivered? || order.cancel
-              link_to "Cancel", "#", onclick: "cancelOrder(this)", class: "button primary", data: { id: order.id }           
+            unless order.status_type == "delivered" || order.status_type == "cancelled"
+              link_to "Cancel", "#", onclick: "cancelOrder(this)", class: "button primary", data: { id: order.id }  # not working cancel button
             else
-                  link_to "Cancel", "#", class: "button primary", style: "opacity: 0.5;" 
+              link_to "Cancel", "#", class: "button primary", style: "opacity: 0.5;"
             end
+          end
+          column "Order Track" do |order|
+            span link_to "Check Order", admin_ordertracker_path(order_id: order.id), class: "button"
           end
         end
       end
-      div do
-        span "Track this order:"
-        span link_to "Show", admin_ordertracker_path, class: "button"
-      end
-    end
+     end
   end
-
+  
   member_action :cancel_order, method: :post do
       order = Order.find(params[:id])
-      order.update(cancel: true)
-      render json:{message: "Order cancel succssfully"}
+      order.update(status_type: "cancelled")
+      render json: { message: "Order cancel succssfully" }
   end
 end

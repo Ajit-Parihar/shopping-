@@ -1,5 +1,5 @@
 ActiveAdmin.register_page "AddToCard" do
-  menu false
+  # menu true
 
   content title: "Add To Card" do
     product = Product.find(params[:product_id])
@@ -7,7 +7,11 @@ ActiveAdmin.register_page "AddToCard" do
     if current_admin_user.seller?
       add_to_card = AddToCard.find_by(admin_user_id: current_admin_user.id, product_id: product.id)
       unless add_to_card
-        add_to_card = AddToCard.create(quantity: 1, admin_user_id: current_admin_user.id, product_id: product.id)
+        add_to_card = AddToCard.create(
+          quantity: 1,
+          admin_user_id: current_admin_user.id,
+          product_id: product.id
+        )
         add_to_card.save
       end
     end
@@ -40,10 +44,12 @@ ActiveAdmin.register_page "AddToCard" do
         end
 
         column "Actions" do |product|
-          link_to "Buy", "#", class: "button buy-button", data: { product_id: product.id }, onclick: "cardAddBuyProduct(this)"
+          link_to "Buy", "#",
+                  class: "button buy-button",
+                  data: { product_id: product.id },
+                  onclick: "cardAddBuyProduct(this)"
         end
       end
-
       div do
         span "Grand Total: ₹"
         span id: "grand-total" do
