@@ -4,14 +4,13 @@ ActiveAdmin.register AdminUser do
   index do
     selectable_column
     id_column
-
+    
     column "Name" do |user|
       link_to "#{user.first_name} #{user.last_name}", admin_admin_user_path(user)
     end
 
     column :email
     column :user_type
-    
   end
 
   filter :email

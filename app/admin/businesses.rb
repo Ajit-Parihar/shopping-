@@ -59,8 +59,7 @@ ActiveAdmin.register Business do
 
   show do |res|
     panel "Products", class: "fade-in-section" do
-      # business_id = params[:id]
-      # products = res
+
       table_for res.products, class: "clickable-table" do
         column :id
         column :name

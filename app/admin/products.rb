@@ -18,18 +18,18 @@ ActiveAdmin.register Product do
       else
         Product.all
       end
-    end
+    end 
 
-    def create
-      super do |format|
-        product = resource
-        SellerProduct.create(
-          seller_id: current_admin_user.id,
-          product_id: product.id,
-          business_id: product.business_id
-        )
-      end
-    end
+    # def create
+    #  super do |create|
+    #     product = resource
+    #     SellerProduct.create(
+    #       seller_id: current_admin_user.id,
+    #       product_id: product.id,
+    #       business_id: product.business_id
+    #     )
+    #  end
+    # end
   end
 
   form do |f|
@@ -51,40 +51,51 @@ ActiveAdmin.register Product do
     selectable_column
     id_column
 
-    column :name do |product|
-      truncate(product.name, length: 30)
-    end
-
-    column :price do |product|
+    # column :name do |product|
+    #   truncate(product.name, length: 30)
+    # end
+    # 
+    column :name
+     
+   column :price do |product|
       number_to_currency(product.price, unit: "₹", precision: 0)
     end
 
-    column "Image" do |product|
-      if product.image.attached?
-        image_tag url_for(product.image), alt: product.name, class: "product-thumb", onclick: "highlightImage(this)"
-      else
-        status_tag "No Image", :warning
-      end
+    column :brand_name
+
+    column "Rating" do |product|
+       product.rating || "Rating Not found"
     end
 
+    column :image do |product|
+      if product.image.attached?
+        image_tag url_for(product.image), alt: product.name, style: "max-width: 300px;", class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
+      else
+         "No Image"
+      end
+    end
     column "" do |product|
       content_tag(:span, "", class: "row-link", data: { href: admin_product_path(product) })
     end
   end
 
-  show do
-    attributes_table do
-      row :image do |product|
-        if product.image.attached?
-          image_tag product.image, alt: product.name, style: 'max-width: 300px;'
-        else
-          "No image available"
-        end
+  show do |res|
+    puts "working fine"
+    puts res.inspect
+    table_for res do 
+      column "Image" do |res|
+        image_tag(res.image, style: 'max_width: 100px;',  class: "product-thumb", onclick: "highlightImage(this)")
       end
-      row :price
-      row :name
-      row :brand_name
-      row :discription
+      column :name
+      column :price
+      column :brand_name
+      column :description
+      column "Buy" do |res|
+        span link_to("Buy", admin_buy_path(product_id: res.id), class: "button buy-button", onclick: "event.stopPropagation()")
+      end 
+      column "Add To card" do 
+       span link_to("Add to Cart", admin_addtocard_path(product_id: res), class: "button cart-button", onclick: "event.stopPropagation()")
+      end
     end
 
     rating = Rating.where(product_id: product.id)
@@ -108,29 +119,17 @@ ActiveAdmin.register Product do
   end
 
   member_action :buy_product, method: :post do
-    if UserAddress.exists?(user_id: current_admin_user.id)
+    product = Product.find(params[:id])
+
+    if UserAddress.find_by(user_id: current_admin_user.id)
       quantity = params[:quantity].to_i
-      product = Product.find(params[:id])
-      seller_product = SellerProduct.find_by(product_id: product.id)
+  
+      order = Order.create_order(current_admin_user, product, quantity)
 
-      if seller_product
-        order = Order.create(
-          user_id: current_admin_user.id,
-          product_id: product.id,
-          seller_id: seller_product.seller_id,
-          business_id: product.business_id
-        )
-
-        # Update sold count
-        current_sold_count = seller_product.sold_count || 0
-        seller_product.update(sold_count: current_sold_count + quantity)
-
-        render json: { message: "Product bought successfully!", sold_count: seller_product.sold_count }
-      else
-        render json: { error: "SellerProduct not found for this product." }, status: :not_found
-      end
+      redirect_to admin_order_path(order), notice: "Product bought Successfully"
     else
-      render json: { error: "No address found for the user." }, status: :unprocessable_entity
+        redirect_to admin_buy_path(product_id: product.id), alert: "No Address found"
     end
   end
+  
 end

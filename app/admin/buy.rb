@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 ActiveAdmin.register_page "Buy" do
   menu false
@@ -7,23 +6,6 @@ ActiveAdmin.register_page "Buy" do
     product = Product.find(params[:product_id])
     status = params[:status]
     addresses = UserAddress.where(user_id: current_admin_user.id)
-
-    if current_admin_user.seller?
-        add_to_card = AddToCard.find_or_create_by(admin_user_id: current_admin_user.id, product_id: product.id) do |card|
-        card.quantity = 1
-      end
-    end
-
-    # if status == "true"
-    #   div do
-    #     raw <<-HTML
-    #       <div id="success-animation" style="flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%;">
-    #         <div style="font-size: 4rem; color: green;">✅</div>
-    #         <p style="color: green; font-weight: bold;">Your order has been placed!</p>
-    #       </div>
-    #     HTML
-    #   end
-    # end
 
     panel "Address" do
       form action: "/admin/some_action", method: :post do
@@ -63,22 +45,16 @@ ActiveAdmin.register_page "Buy" do
         end
 
         column "Quantity + Total" do |p|
-          raw <<-HTML
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <button class="decrease-btn" data-id="#{p.id}">➖</button>
-              <span id="quantity-#{p.id}">1</span>
-              <button class="increase-btn" data-id="#{p.id}">➕</button>
-            </div>
-            <div style="margin-top: 8px;">
-              Total: ₹<span id="total-pay-#{p.id}" data-price="#{p.price}">#{p.price}</span>
-            </div>
-          HTML
+          render partial: "admin/quantity_total", locals: { product: product }
         end
 
         column "Actions" do |p|
-          link_to "Order Placed", "#", class: "button buy-button", data: { product_id: p.id }, onclick: "cardAddBuyProduct(this)"
-        end
-      end
+          link_to "Buy Now", buy_product_admin_product_path(product, quantity: 1),  
+           method: :post, 
+           data: { confirm: "Are you sure?" }, 
+           class: "btn btn-success" 
+         end
+       end
 
       div do
         span "Grand Total: ₹ #{product.price}"

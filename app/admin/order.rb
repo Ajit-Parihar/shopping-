@@ -2,7 +2,7 @@ ActiveAdmin.register Order do
   permit_params :user_id, :product_id, :seller_id, :business_id
 
   if proc { current_admin_user.admin? || current_admin_user.seller? }
-    actions :index, :show, :new, :create
+    actions :index, :show
   else
     actions :show
   end
@@ -16,7 +16,6 @@ ActiveAdmin.register Order do
         redirect_to admin_order_path(order.id)
         else
           redirect_to admin_root_path, alert: "You have not purchased anything on this platform."
-
         end
       else
         super
@@ -34,29 +33,6 @@ ActiveAdmin.register Order do
       end
     end
   end
-
-  form do |f|
-    f.inputs "Create Order" do
-      f.input :user_id,
-              label: "Buyer",
-              as: :select,
-              collection: AdminUser.where(user_type: [ "user", "seller" ])
-                                   .where.not(id: current_admin_user.id)
-                                   .map { |u| [ u.email, u.id ] }
-
-      f.input :product_id,
-              as: :select,
-              collection: Product.all.map { |p| [ "#{p.name} (#{p.brand_name})", p.id ] }
-
-      f.object.seller_id = current_admin_user.id
-
-      f.input :business_id,
-              as: :select,
-              collection: Business.all.map { |b| [ b.category, b.id ] }
-    end
-    f.actions
-  end
-
 
   index do
     selectable_column
@@ -114,7 +90,7 @@ ActiveAdmin.register Order do
       all_orders = Order.where(user_id: current_admin_user.id)
       panel "Total buyers have purchased this product" do
         table_for all_orders do
-          column "prdouct" do |order|
+          column "product" do |order|
              image_tag(order.product.image,  class: "product-thumb",)
           end
           column "Buyer" do |order|
@@ -131,21 +107,25 @@ ActiveAdmin.register Order do
                order.status_type
           end
 
-           column "rating" do |order|
-             rating = Rating.find_by(order_id: order)
-             puts "working good"
-             puts resource.inspect
-            if rating == nil && order.status_type == "delivered"
+          column "Rating" do |order|
+            rating = Rating.find_by(order_id: order.id)
+          
+            if rating.nil? && order.status_type == "delivered"
               link_to "Add Rating", "#", onclick: "productRating(this)", class: "button primary", data: { id: order.id }
-            end
-              unless rating == nil
-                rating.rate
+            elsif rating.present?
+              rating.rate
+            else
+              "Not Rated Yet"
             end
           end
+          
           column "Cancel Order" do |order|
             unless order.status_type == "delivered" || order.status_type == "cancelled"
-              link_to "Cancel", "#", onclick: "cancelOrder(this)", class: "button primary", data: { id: order.id }  # not working cancel button
-            else
+              link_to "Cancel", cancel_order_admin_order_path(order), 
+              method: :post, 
+              data: { confirm: "Are you sure?" }, 
+              class: "btn btn-success" 
+              else         
               link_to "Cancel", "#", class: "button primary", style: "opacity: 0.5;"
             end
           end
@@ -160,6 +140,6 @@ ActiveAdmin.register Order do
   member_action :cancel_order, method: :post do
       order = Order.find(params[:id])
       order.update(status_type: "cancelled")
-      render json: { message: "Order cancel succssfully" }
+      redirect_to admin_order_path(order.id), notice: "Order Cancel Succssfully"
   end
 end

@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get "partial/quantity_total"
+  get "pages/quantity_total"
+  get "pages/index"
   get "home/index"
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)

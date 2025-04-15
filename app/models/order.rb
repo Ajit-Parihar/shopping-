@@ -3,7 +3,7 @@ class Order < ApplicationRecord
   belongs_to :product
   belongs_to :seller, class_name: 'AdminUser'
   belongs_to :business
-  has_many :ratings
+  has_one :rating
 
   STATUS_TYPES = [
     "ordered",
@@ -23,25 +23,56 @@ class Order < ApplicationRecord
       "cancelled" => 100
     }
 
+    def self.create_order(user, product, quantity)
+      seller_product = SellerProduct.find_by(product_id: product.id)
+  
+      order = Order.create(
+        user_id: user.id,
+        product_id: product.id,
+        seller_id: seller_product.seller_id,
+        business_id: product.business_id
+      )
+  
+      current_sold_count = seller_product.sold_count || 0
+      seller_product.update(sold_count: current_sold_count + quantity)
+  
+      order
+    end
 
   def progress_percentage
-    if Time.current >= created_at + 3.minutes
+     case true
+     when status_type == "cancelled"
+      return calculate_progress(100)
+
+     when Time.current >= created_at + 3.minutes
       update(status_type: "delivered")
       return calculate_progress(100)
-  
-    elsif Time.current >= created_at + 2.minutes
+
+     when Time.current >= created_at + 2.minutes
       update(status_type: "out_for_delivery")
       return calculate_progress(80)
-  
-    elsif Time.current >= created_at + 1.minutes
+
+     when Time.current >= created_at + 1.minutes
       update(status_type: "shipped")
       return calculate_progress(50)
-  
-    else
+
+     else
       update(status_type: "processing")
       return calculate_progress(20)
-    end
   end
+end
+
+def bar_color
+  case status_type
+  when "delivered"        then "#10b981"  
+  when "cancelled"        then "#ef4444"  
+  when "processing"       then "#3b82f6"   
+  when "shipped"          then "#f59e0b"   
+  when "out_for_delivery" then "#f97316"  
+  else "#e5e7eb"                         
+  end
+end
+
   private
   def calculate_progress(progress)
     elapsed_time = Time.current - created_at

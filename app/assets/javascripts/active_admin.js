@@ -14,7 +14,6 @@ function highlightImage(image){
     overlay.appendChild(bigImage);
     document.body.appendChild(overlay);
   
-    // Remove overlay on click
     overlay.addEventListener("click", () => {
       bigImage.classList.remove("image-zoomed");
       document.body.removeChild(overlay);
@@ -104,46 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateGrandTotal();
   });
   
-  function cardAddBuyProduct(button) {
-    const productId = button.dataset.productId;
-    const quantity = parseInt(document.getElementById(`quantity-${productId}`).textContent);
-
-    fetch(`/admin/products/${productId}/buy_product`, {
-      method: "POST",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        quantity: quantity
-      })
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
-      return response.json(); 
-    })
-    .then(data => {
-      console.log("Buy successful:", data);
-    
-      const anim = document.getElementById("order-animation");
-      if (anim) {
-        anim.style.display = "flex";
-      }
-     
-        window.location.href = "/admin/orders";
-   
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("please add address then continue");
-
-      window.location.href = `/admin/buy?product_id=${productId}&status=false`;
-    });
-
-  }
-
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".clickable-table tbody tr").forEach(function (row) {
     row.addEventListener("click", function () {
@@ -151,42 +110,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const productId = row.querySelector("td:first-child").textContent.trim();
       console.log(productId)
       if (productId) {
-        window.location.href = "/admin/displayproduct?product_id=" + encodeURIComponent(productId);
+        window.location.href = "/admin/products/" + encodeURIComponent(productId);
       }
     });
   });
 });
 
-function cancelOrder(cancel) {
-  const orderId = cancel.dataset.id;
-
-  if (confirm("Are you sure you want to cancel your order?")) {
-    alert("Cancelling order ID: " + orderId);
-
-    fetch(`/admin/orders/${orderId}/cancel_order`, {
-      method: "POST",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        "Content-Type": "application/json"
-      },
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
-      window.location.href = `/admin/orders/${orderId}`
-      return response.json(); 
-    })
- 
-    .catch(error => {
-      console.error("Cancel failed:", error);
-      alert("Something went wrong while cancelling the order.");
-    });
-
-  } else {
-    alert("Order cancellation aborted.");
-  }
-}
 
 function productRating(rating){
    console.log(rating)
@@ -196,3 +125,33 @@ function productRating(rating){
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".increase-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.id;
+      const quantitySpan = document.getElementById(`quantity-${id}`);
+      const totalSpan = document.getElementById(`total-pay-${id}`);
+      const price = parseFloat(totalSpan.dataset.price);
+      console.log(quantitySpan)
+      let quantity = parseInt(quantitySpan.textContent);
+       console.log(quantity)
+      quantitySpan.textContent = quantity;
+      totalSpan.textContent = (quantity * price).toFixed(2);
+    });
+  });
+
+  document.querySelectorAll(".decrease-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.id;
+      const quantitySpan = document.getElementById(`quantity-${id}`);
+      const totalSpan = document.getElementById(`total-pay-${id}`);
+      const price = parseFloat(totalSpan.dataset.price);
+      let quantity = parseInt(quantitySpan.textContent);
+
+      if (quantity > 1) {
+        quantitySpan.textContent = quantity;
+        totalSpan.textContent = (quantity * price).toFixed(2);
+      }
+    });
+  });
+});
