@@ -8,8 +8,6 @@ ActiveAdmin.register_page "Buy" do
     addresses = UserAddress.where(user_id: current_admin_user.id)
 
     panel "Address" do
-      form action: "/admin/some_action", method: :post do
-        input type: "hidden", name: "authenticity_token", value: form_authenticity_token
 
         table_for addresses do
           column "Select" do |add|
@@ -22,14 +20,6 @@ ActiveAdmin.register_page "Buy" do
           link_to "Add Address", new_admin_user_address_path(product_id: product.id), class: "button primary"
         end
       end
-    end
-
-    if status == "false"
-      div style: "margin-top: 20px;" do
-        para "⚠️ Address is required before placing an order.",
-             style: "color: red; font-weight: bold; margin-bottom: 10px;"
-      end
-    end
 
     panel "Product Detail" do
       table_for product do

@@ -12,9 +12,8 @@ ActiveAdmin.register AdminUser do
     column :email
     column :user_type
   end
-
   filter :email
-
+  
   form do |f|
     f.inputs "Admin User Details" do
       f.input :first_name

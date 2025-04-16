@@ -3,8 +3,6 @@ ActiveAdmin.register Product do
   remove_filter :image_attachment, :image_blob
 
   permit_params :name, :price, :brand_name, :discription, :image, :business_id, :rating, :seller_id
-
-
   filter :name
   filter :brand_name
 
@@ -14,22 +12,13 @@ ActiveAdmin.register Product do
       if current_admin_user.admin? 
          Product.all
       elsif current_admin_user.seller?  
-        Product.all         #changes are needed
+        Product.joins(:seller_products)
+             .where(seller_products: { seller_id: current_admin_user.id })
+             .distinct
       else
         Product.all
       end
     end 
-
-    # def create
-    #  super do |create|
-    #     product = resource
-    #     SellerProduct.create(
-    #       seller_id: current_admin_user.id,
-    #       product_id: product.id,
-    #       business_id: product.business_id
-    #     )
-    #  end
-    # end
   end
 
   form do |f|
@@ -50,19 +39,11 @@ ActiveAdmin.register Product do
   index row_class: ->(product) { "clickable-row" } do
     selectable_column
     id_column
-
-    # column :name do |product|
-    #   truncate(product.name, length: 30)
-    # end
-    # 
     column :name
-     
    column :price do |product|
       number_to_currency(product.price, unit: "₹", precision: 0)
     end
-
     column :brand_name
-
     column "Rating" do |product|
        product.rating || "Rating Not found"
     end
@@ -80,8 +61,6 @@ ActiveAdmin.register Product do
   end
 
   show do |res|
-    puts "working fine"
-    puts res.inspect
     table_for res do 
       column "Image" do |res|
         image_tag(res.image, style: 'max_width: 100px;',  class: "product-thumb", onclick: "highlightImage(this)")
@@ -89,7 +68,8 @@ ActiveAdmin.register Product do
       column :name
       column :price
       column :brand_name
-      column :description
+      column :discription
+      unless current_admin_user.admin? || current_admin_user.seller?
       column "Buy" do |res|
         span link_to("Buy", admin_buy_path(product_id: res.id), class: "button buy-button", onclick: "event.stopPropagation()")
       end 
@@ -97,7 +77,8 @@ ActiveAdmin.register Product do
        span link_to("Add to Cart", admin_addtocard_path(product_id: res), class: "button cart-button", onclick: "event.stopPropagation()")
       end
     end
-
+    end
+    
     rating = Rating.where(product_id: product.id)
     unless rating.empty?
       panel "Reviews & Ratings" do
@@ -119,17 +100,15 @@ ActiveAdmin.register Product do
   end
 
   member_action :buy_product, method: :post do
-    product = Product.find(params[:id])
 
     if UserAddress.find_by(user_id: current_admin_user.id)
       quantity = params[:quantity].to_i
   
-      order = Order.create_order(current_admin_user, product, quantity)
+      order = Order.create_order(current_admin_user, resource, quantity)
 
-      redirect_to admin_order_path(order), notice: "Product bought Successfully"
+        redirect_to admin_order_path(order), notice: "Product bought Successfully"
     else
-        redirect_to admin_buy_path(product_id: product.id), alert: "No Address found"
+        redirect_to admin_buy_path(product_id: resource.id), alert: "No Address found"
     end
   end
-  
 end

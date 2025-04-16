@@ -155,3 +155,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+
+function product(item){
+  urlString = item.ownerDocument.URL
+  let parsedUrl = new URL(urlString);
+  let orderId = parsedUrl.searchParams.get("order_id");
+  
+  // console.log(orderId)
+
+  window.location.href = `/admin/products/${orderId}`
+
+}

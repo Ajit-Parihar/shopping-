@@ -33,7 +33,7 @@ ActiveAdmin.register Order do
       end
     end
   end
-
+  
   index do
     selectable_column
       column "Product Name" do |order|
@@ -124,22 +124,25 @@ ActiveAdmin.register Order do
               link_to "Cancel", cancel_order_admin_order_path(order), 
               method: :post, 
               data: { confirm: "Are you sure?" }, 
-              class: "btn btn-success" 
+              class: "button primary"
               else         
               link_to "Cancel", "#", class: "button primary", style: "opacity: 0.5;"
             end
           end
-          column "Order Track" do |order|
+          column "Details" do |order|
             span link_to "Check Order", admin_ordertracker_path(order_id: order.id), class: "button"
           end
         end
+        
       end
      end
   end
   
   member_action :cancel_order, method: :post do
-      order = Order.find(params[:id])
-      order.update(status_type: "cancelled")
-      redirect_to admin_order_path(order.id), notice: "Order Cancel Succssfully"
+      # order = Order.find(params[:id])
+      puts "resoruce put "
+      puts resource.inspect
+      resource.update(status_type: "cancelled")
+      redirect_to admin_order_path(resource.id), notice: "Order Cancel Succssfully"
   end
 end

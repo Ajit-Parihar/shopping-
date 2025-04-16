@@ -1,5 +1,4 @@
 ActiveAdmin.register UserAddress do
-  menu false
   permit_params :country, :state, :dist, :block, :town, :gali_no, :house_no, :user_id
 
   form do |f|

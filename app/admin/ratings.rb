@@ -7,7 +7,6 @@ ActiveAdmin.register Rating do
   controller do
     def new
       @rating = Rating.new
-
       if params[:order_id].present?
         order = Order.find_by(id: params[:order_id])
         if order
@@ -15,10 +14,7 @@ ActiveAdmin.register Rating do
           @rating.admin_user_id = order.user_id
           @rating.order_id = order.id
         end
-        puts "Initializing new rating:"
-        puts @rating.inspect
-      end
-      super
+       end
     end
 
     def create

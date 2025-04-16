@@ -13,7 +13,6 @@ class AdminUser < ApplicationRecord
    has_many :ratings
    has_many :order_trackers
 
-
   validates :password, :presence => true, :format => {:with => /\A[a-z0-9A-Z_@]{8,30}\Z/, message: :not_valid}, on: :create
   validates :password, {
       :presence => true, :format => {:with => /\A[a-z0-9A-Z_@]{8,30}\Z/, message: :not_valid },
@@ -35,5 +34,4 @@ class AdminUser < ApplicationRecord
   def user?
     user_type == "user"
   end
-
 end

@@ -18,5 +18,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
    root "home#index"
+  # get "page/not_found", to: "errors#not_found"
+  # get "page/unauthorized", to: "errors#unauthorized"
   
 end
