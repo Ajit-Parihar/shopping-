@@ -1,9 +1,14 @@
 class Order < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :user, class_name: 'AdminUser'
   belongs_to :product
+  belongs_to :user_address, class_name: "UserAddress", foreign_key: "address_id"
   belongs_to :seller, class_name: 'AdminUser'
   belongs_to :business
-  has_one :rating
+  has_one :rating, dependent: :destroy  # Cascade destroy the associated rating
+
+
 
   STATUS_TYPES = [
     "ordered",
@@ -23,16 +28,30 @@ class Order < ApplicationRecord
       "cancelled" => 100
     }
 
-    def self.create_order(user, product, quantity)
+    def self.create_order(user, product, quantity, address_id)
       seller_product = SellerProduct.find_by(product_id: product.id)
-  
+      puts 'quantity model'
+       puts quantity.class
       order = Order.create(
         user_id: user.id,
         product_id: product.id,
+        address_id: address_id,
         seller_id: seller_product.seller_id,
-        business_id: product.business_id
+        business_id: product.business_id,
+        quantity: quantity
+
       )
-  
+        transaction = Transaction.find_by(product_id: product.id)
+        unless transaction
+        transaction = Transaction.create(
+        product_id: product.id,
+        seller_id: seller_product.seller_id,
+        amount: product.price
+      )
+       else
+          transaction.update(amount: transaction.amount+product.price)
+       end
+
       current_sold_count = seller_product.sold_count || 0
       seller_product.update(sold_count: current_sold_count + quantity)
   

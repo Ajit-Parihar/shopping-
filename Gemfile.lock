@@ -44,6 +44,12 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
+    active_storage_validations (2.0.3)
+      activejob (>= 6.1.4)
+      activemodel (>= 6.1.4)
+      activestorage (>= 6.1.4)
+      activesupport (>= 6.1.4)
+      marcel (>= 1.0.3)
     activeadmin (3.3.0)
       arbre (~> 1.2, >= 1.2.1)
       csv
@@ -110,12 +116,9 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     chartkick (5.1.4)
+    chronic (0.10.2)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.0)
-    countries (7.1.1)
-      unaccent (~> 0.3)
-    country_select (10.0.1)
-      countries (> 5.0, < 8.0)
     crass (1.0.6)
     csv (3.3.3)
     date (3.4.1)
@@ -232,6 +235,8 @@ GEM
     orm_adapter (0.5.0)
     ostruct (0.6.1)
     parallel (1.26.3)
+    paranoia (3.0.1)
+      activerecord (>= 6, < 8.1)
     parser (3.3.7.4)
       ast (~> 2.4.1)
       racc
@@ -399,7 +404,6 @@ GEM
       concurrent-ruby (~> 1.0)
     tzinfo-data (1.2025.2)
       tzinfo (>= 1.0.0)
-    unaccent (0.4.0)
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
@@ -417,6 +421,8 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    whenever (1.0.0)
+      chronic (>= 0.6.3)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.2)
@@ -426,18 +432,19 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  active_storage_validations
   activeadmin
   bootsnap
   brakeman
   cancancan
   capybara
   chartkick
-  country_select
   debug
   devise
   importmap-rails
   jbuilder
   kamal
+  paranoia (~> 3.0)
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2)
@@ -453,6 +460,7 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   web-console
+  whenever
 
 BUNDLED WITH
    2.6.6

@@ -1,11 +1,12 @@
 ActiveAdmin.register Rating do
+  config.clear_action_items!
   menu false
   remove_filter :photos_attachments, :photos_blob
 
   permit_params :comments, :rate, :admin_user_id, :product_id, :order_id, photos: []
 
-  controller do
-    def new
+    controller do
+     def new
       @rating = Rating.new
       if params[:order_id].present?
         order = Order.find_by(id: params[:order_id])
@@ -21,19 +22,18 @@ ActiveAdmin.register Rating do
       super do |success, failure|
         success.html do
           product = Product.find(resource.product_id)
-          
           if product.rating.nil?
             product.update(rating: resource.rate)
           else
             new_rating = ((product.rating.to_f + resource.rate.to_f) / 2).round(1)
             product.update(rating: new_rating)
           end
-
           redirect_to admin_rating_path(resource) and return
         end
-
+    
         failure.html do
-
+          flash.now[:error] = resource.errors.full_messages.to_sentence
+          render :new
         end
       end
     end
@@ -50,4 +50,15 @@ ActiveAdmin.register Rating do
     end
     f.actions
   end
+
+   show do
+      attributes_table do 
+         row :comments
+           row :rate
+           row :admin_user do |rating|
+            rating.admin_user&.first_name || "N/A"
+          end
+           row :product
+      end
+   end
 end

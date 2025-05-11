@@ -1,7 +1,9 @@
 
 @import "active_admin/mixins";
 @import "active_admin/base";
-// @import "devise";
+
+
+
 
 .product-thumb {
     max-width: 100px;
@@ -100,3 +102,124 @@
     background-color: #eee
   }
   
+
+  .custom-panel {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  
+    h3 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+  }
+  
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+  
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+  
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+  
+    img {
+      max-width: 100px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+  }
+  
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    margin: 2px;
+    border-radius: 5px;
+    transition: background 0.2s;
+  
+    &:hover {
+      background-color: #45a049;
+  
+      .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  
+    .tooltiptext {
+      visibility: hidden;
+      background-color: #222;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 4px 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -50px;
+      width: 100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+  }
+  
+  .custom-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50;
+    padding: 10px 20px;
+    color: white;
+  
+    .nav-left {
+      .nav-brand {
+        font-size: 20px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+    }
+  
+    .nav-right {
+      .nav-link {
+        margin-left: 15px;
+        color: white;
+        text-decoration: none;
+  
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+

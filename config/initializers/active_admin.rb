@@ -4,6 +4,24 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
+
+
+
+  # new page open in new tab
+  # config.namespace :admin do |admin|
+  #   admin.build_menu :utility_navigation do |menu|
+  #     menu.add label: "My Profile", url: "/admin/profile", html_options: { target: :self }
+  #   end
+  # end
+
+  config.namespace :admin do |admin|
+    admin.build_menu :utility_navigation do |menu|
+      menu.add label: "My Profile", url: "/admin/profile"
+    end
+  end
+
+
+  
   config.site_title = "Business Management2"
 
   # Set the link url for the title. For example, to take
@@ -72,6 +90,7 @@ ActiveAdmin.setup do |config|
   # This setting changes the method which Active Admin calls
   # within the application controller.
   config.authentication_method = :authenticate_admin_user!
+  # config.authentication_method = nil
 
   # == User Authorization
   #

@@ -1,9 +1,8 @@
          <div style="display: flex; align-items: center; gap: 10px;">
-              <button class="decrease-btn" data-id="<%=product.id%>">➖</button>
-              <span id="quantity-<%=product.id%>">1</span>
-              <button class="increase-btn" data-id="<%=product.id%>">➕</button>
+              <button class="decrease-btn" data-id="<%=cart.id%>">➖</button>
+              <span id="quantity-<%=cart.id%>"><%=cart.quantity%></span>
+              <button class="increase-btn" data-id="<%=cart.id%>">➕</button>
             </div>
             <div style="margin-top: 8px;">
-                Total: ₹<span id="total-pay-<%= product.id %>" data-price="<%= product.price %>"><%= product.price %></span>
-            </div>
-
+               Total: ₹<span id="total-pay-<%= cart.id %>" data-price="<%= cart.product.price %>"><%= cart.quantity*cart.product.price %></span>
+         </div>

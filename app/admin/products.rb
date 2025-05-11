@@ -1,6 +1,15 @@
 ActiveAdmin.register Product do
-  config.batch_actions = false
   remove_filter :image_attachment, :image_blob
+
+  config.clear_action_items!
+
+  action_item :create_product, only: :index do
+    if current_admin_user.seller?
+      link_to 'New Product', new_admin_product_path
+    end
+  end
+
+  scope :all, default: true
 
   permit_params :name, :price, :brand_name, :discription, :image, :business_id, :rating, :seller_id
   filter :name
@@ -9,24 +18,32 @@ ActiveAdmin.register Product do
 
   controller do
     def scoped_collection
-      if current_admin_user.admin? 
-         Product.all
-      elsif current_admin_user.seller?  
+      if current_admin_user.admin?
+ 
+        Product.with_deleted
+  
+      elsif current_admin_user.seller?
         Product.joins(:seller_products)
-             .where(seller_products: { seller_id: current_admin_user.id })
-             .distinct
+               .where(seller_products: { seller_id: current_admin_user.id })
+               .where(deleted_at: nil)
+               .distinct
+   
       else
-        Product.all
+        Product.where(deleted_at: nil)
       end
-    end 
+  end
+  
+
   end
 
+  
   form do |f|
     f.inputs "Product Details" do
       f.input :name
       f.input :price
       f.input :brand_name
       f.input :discription
+    
       f.input :image, as: :file
       f.input :business_id,
               as: :radio,
@@ -36,29 +53,52 @@ ActiveAdmin.register Product do
     f.actions
   end
 
-  index row_class: ->(product) { "clickable-row" } do
+ index do
     selectable_column
-    id_column
+     column :image do |product|
+      if product.image.attached?
+        image_tag url_for(product.image), alt: product.name, style: "max-width: 300px;", class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
+      else
+        "No Image"
+      end
+    end
+
     column :name
-   column :price do |product|
+    column :price do |product|
       number_to_currency(product.price, unit: "₹", precision: 0)
     end
     column :brand_name
     column "Rating" do |product|
-       product.rating || "Rating Not found"
+      product.rating || "Rating Not found"
     end
+   
 
-    column :image do |product|
-      if product.image.attached?
-        image_tag url_for(product.image), alt: product.name, style: "max-width: 300px;", class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
-      else
-         "No Image"
-      end
-    end
-    column "" do |product|
-      content_tag(:span, "", class: "row-link", data: { href: admin_product_path(product) })
+actions defaults: false do |product|
+  item "View", resource_path(product), class: "member_link"
+  
+  if can?(:manage, product) 
+    item "Edit", edit_resource_path(product), class: "member_link"
+  end
+
+  unless product.deleted_at.present?
+    if can?(:destroy, product) 
+      item "Delete", resource_path(product),
+           method: :delete,
+           data: { confirm: "Are you sure?" },
+           class: "member_link delete_link"
     end
   end
+
+  if product.deleted_at.present?
+    if can?(:update, product) 
+      item "Restore", restore_admin_product_path(product),
+           method: :put,
+           data: { confirm: "Are you sure you want to restore this product?" },
+           class: "member_link"
+    end
+  end
+end
+end
 
   show do |res|
     table_for res do 
@@ -71,10 +111,10 @@ ActiveAdmin.register Product do
       column :discription
       unless current_admin_user.admin? || current_admin_user.seller?
       column "Buy" do |res|
-        span link_to("Buy", admin_buy_path(product_id: res.id), class: "button buy-button", onclick: "event.stopPropagation()")
+        span link_to("Buy", admin_buy_path(product_id: res.id), class: "button buy-button")
       end 
       column "Add To card" do 
-       span link_to("Add to Cart", admin_addtocard_path(product_id: res), class: "button cart-button", onclick: "event.stopPropagation()")
+       span link_to("Add to Cart", admin_addtocard_path(product_id: res), class: "button cart-button")
       end
     end
     end
@@ -100,15 +140,25 @@ ActiveAdmin.register Product do
   end
 
   member_action :buy_product, method: :post do
-
-    if UserAddress.find_by(user_id: current_admin_user.id)
+    if UserAddress.find_by(user_id: current_admin_user.id) && params[:address_id]
       quantity = params[:quantity].to_i
-  
-      order = Order.create_order(current_admin_user, resource, quantity)
+      puts "quantity print"
+      
+      puts quantity.inspect
+      
+      address_id = params[:address_id].to_i
+      
 
-        redirect_to admin_order_path(order), notice: "Product bought Successfully"
+      order = Order.create_order(current_admin_user, resource, quantity, address_id)
+
+        redirect_to admin_orders_path, notice: "Product bought Successfully"
     else
         redirect_to admin_buy_path(product_id: resource.id), alert: "No Address found"
     end
   end
+  member_action :restore, method: :put do
+    resource.restore_with_dependents
+    redirect_to admin_products_path, notice: "Product and related records restored successfully!"
+  end
+  
 end

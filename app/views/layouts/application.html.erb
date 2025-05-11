@@ -10,19 +10,19 @@
 
     <%= yield :head %>
 
-
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+   <%= stylesheet_link_tag "active_admin", "data-turbo-track": "reload" %>
+     <%= stylesheet_link_tag 'devise_signup', 'data-turbo-track': 'reload' %>
+
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
     <%= javascript_importmap_tags %>
 
-    <%= javascript_include_tag "application", type: "module" %>
+    <%= javascript_include_tag 'active_admin' %>
 
   </head>
-
   <body>
     <%= yield %>
   </body>

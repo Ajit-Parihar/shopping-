@@ -1,6 +1,5 @@
 ActiveAdmin.register_page "OrderTracker" do
   menu false
-
   content title: "Order Progress Overview" do
     if params[:order_id].present?
       begin
@@ -22,18 +21,23 @@ ActiveAdmin.register_page "OrderTracker" do
               span style: "font-weight: bold; color: #10b981;" do
                 "Ordered"
               end
+              
               span style: "font-weight: bold; color: #3b82f6;" do
               "Processing"
                end
+
                span style: "font-weight: bold; color: #f59e0b;" do
                "Shipped"
               end
+
               span style: "font-weight: bold; color: #f97316;" do
                "Out for delivery"
                 end
+
                span style: "font-weight: bold; color: #10b981;" do
                 "Delivered"
                end
+
                span style: "font-weight: bold; color: #ef4444;" do
                "Cancelled"
                end
@@ -52,14 +56,19 @@ ActiveAdmin.register_page "OrderTracker" do
                        column :name
                        column :brand_name
 
-                       column :rating
+                       column "Rating" do |product|
+                        product.rating || "Rating Not found"
+                     end
 
                        column "Price" do |p|
                         number_to_currency(p.price, unit: "₹")
                       end
                       column "Image" do |p|
-                        image_tag(p.image, style: "max-width: 100px;", onclick: "product(this)")
-                      end   
+                        link_to admin_product_path(p.id) do
+                          image_tag(p.image, style: "max-width: 100px;")
+                        end
+                      end
+                      
                   end
              end
           end

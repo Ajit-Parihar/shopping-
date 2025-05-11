@@ -72,6 +72,13 @@ gem "cancancan"
 
 gem 'chartkick'
 
-gem 'country_select'
+gem 'paranoia', '~> 3.0'
+
+gem 'active_storage_validations'
+
+gem 'whenever', require: false
+
+
+
 
 

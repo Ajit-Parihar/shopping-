@@ -1,12 +1,53 @@
 class Product < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :business
-  has_many :seller_products
-  has_many :orders
-  has_many :add_to_cards
-  has_many :ratings
+  
+  has_many :seller_products, dependent: :destroy
+  has_many :orders, dependent: :destroy
+  has_many :add_to_cards, dependent: :destroy
+  has_many :ratings, dependent: :destroy
+  has_many :transactions, dependent: :destroy
   has_one_attached :image
 
 
+
+
+
+  def restore_with_dependents
+    restore
+    reload
+
+
+    # Restore dependent records
+    orders.only_deleted.each(&:restore)
+    ratings.only_deleted.each(&:restore)
+    add_to_cards.only_deleted.each(&:restore)
+    transactions.only_deleted.each(&:restore)
+    seller_products.only_deleted.each(&:restore)
+  end
+
+
+  validates :name, presence: { message: "Product name can't be blank." }, 
+                   length: { in: 3..100, message: "Product name must be between 3 and 100 characters." }
+
+  validates :price, presence: { message: "Price can't be blank." },
+                    numericality: { greater_than_or_equal_to: 0, message: "Price must be a positive number." }
+
+  validates :brand_name, presence: { message: "Brand name can't be blank." },
+                         length: { in: 2..50, message: "Brand name must be between 2 and 50 characters." }
+
+  validates :discription, presence: { message: "Description can't be blank." },
+                          length: { maximum: 500, message: "Description can't exceed 500 characters." }
+
+  validates :business_id, presence: { message: "Product category must be selected." }
+
+  # # Image validation
+  # validates :image,
+  #           attached: true,
+  #           content_type: { in: ['image/png', 'image/jpeg'], message: "must be PNG or JPEG" },
+  #           size: { less_than: 5.megabytes, message: "should be under 5MB" }
+  
   after_create :create_seller_product
 
   private

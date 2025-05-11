@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_08_112430) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -59,6 +59,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
     t.integer "product_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["admin_user_id"], name: "index_add_to_cards_on_admin_user_id"
     t.index ["product_id"], name: "index_add_to_cards_on_product_id"
   end
@@ -74,6 +75,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
     t.string "user_type"
     t.string "first_name"
     t.string "last_name"
+    t.datetime "deleted_at"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -82,17 +84,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
     t.string "category"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
   end
 
   create_table "orders", force: :cascade do |t|
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "product_id", null: false
-    t.integer "seller_id", null: false
+    t.integer "seller_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "business_id", null: false
     t.string "status_type", default: "ordered"
     t.integer "address_id"
+    t.datetime "deleted_at"
+    t.integer "quantity"
     t.index ["address_id"], name: "index_orders_on_address_id"
     t.index ["business_id"], name: "index_orders_on_business_id"
     t.index ["product_id"], name: "index_orders_on_product_id"
@@ -109,6 +114,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
     t.integer "price"
     t.string "discription"
     t.decimal "rating", precision: 2, scale: 1
+    t.datetime "deleted_at"
     t.index ["business_id"], name: "index_products_on_business_id"
   end
 
@@ -120,6 +126,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "order_id", null: false
+    t.datetime "deleted_at"
     t.index ["admin_user_id"], name: "index_ratings_on_admin_user_id"
     t.index ["order_id"], name: "index_ratings_on_order_id"
     t.index ["product_id"], name: "index_ratings_on_product_id"
@@ -132,9 +139,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
     t.bigint "product_id", null: false
     t.integer "sold_count"
     t.integer "business_id", null: false
+    t.datetime "deleted_at"
     t.index ["business_id"], name: "index_seller_products_on_business_id"
     t.index ["product_id"], name: "index_seller_products_on_product_id"
     t.index ["seller_id"], name: "index_seller_products_on_seller_id"
+  end
+
+  create_table "transactions", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "seller_id"
+    t.decimal "amount", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_transactions_on_deleted_at"
+    t.index ["product_id"], name: "index_transactions_on_product_id"
+    t.index ["seller_id"], name: "index_transactions_on_seller_id"
   end
 
   create_table "user_addresses", force: :cascade do |t|
@@ -148,6 +168,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.datetime "deleted_at"
     t.index ["user_id"], name: "index_user_addresses_on_user_id"
   end
 
@@ -163,5 +184,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_051646) do
   add_foreign_key "ratings", "orders"
   add_foreign_key "ratings", "products"
   add_foreign_key "seller_products", "businesses"
+  add_foreign_key "transactions", "admin_users", column: "seller_id"
+  add_foreign_key "transactions", "products"
   add_foreign_key "user_addresses", "admin_users", column: "user_id"
 end

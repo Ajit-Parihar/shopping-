@@ -3,8 +3,17 @@ Rails.application.routes.draw do
   get "pages/quantity_total"
   get "pages/index"
   get "home/index"
-  devise_for :admin_users, ActiveAdmin::Devise.config
+#   devise_for :admin_users, ActiveAdmin::Devise.config
+devise_for :admin_users, ActiveAdmin::Devise.config.merge(
+  controllers: {
+    registrations: 'admin/registrations'
+  }
+)
+
+
   ActiveAdmin.routes(self)
+
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -18,6 +27,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
    root "home#index"
+   get "product/:id", to: "home#product", as: "product"
+   patch 'add_to_cards/:product_id/update_quantity', to: 'add_to_cards#update_quantity', as: 'update_cart_quantity'
+
   # get "page/not_found", to: "errors#not_found"
   # get "page/unauthorized", to: "errors#unauthorized"
   

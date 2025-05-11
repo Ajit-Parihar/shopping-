@@ -1,0 +1,334 @@
+.custom-panel {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .custom-panel h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .custom-table th,
+  .custom-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .custom-table tr:hover {
+    background-color: #f9f9f9;
+  }
+
+  .custom-table img {
+    max-width: 100px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    margin: 2px;
+    border-radius: 5px;
+    transition: background 0.2s;
+  }
+
+  .tooltip:hover {
+    background-color: #45a049;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 4px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* above the button */
+    left: 50%;
+    margin-left: -50px;
+    width: 100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+
+
+
+  .custom-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50;
+    padding: 10px 20px;
+    color: white;
+  }
+  
+  .nav-left .nav-brand {
+    font-size: 20px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .nav-right .nav-link {
+    margin-left: 15px;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .nav-link:hover {
+    text-decoration: underline;
+  }
+  
+
+
+
+
+
+
+
+  /* General Page Styles */
+body {
+  background-color: #121212; /* Dark background for the page */
+  color: #f5f5f5; /* Light text for readability */
+  font-family: 'Arial', sans-serif;
+}
+
+.index_page, .show_page {
+  background-color: #1e1e1e; /* Darker background for content sections */
+  color: #f5f5f5;
+}
+
+.panel {
+  background-color: #222222; /* Dark panel background */
+  border: 1px solid #444444;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.panel h3 {
+  color: #ff4d00; /* Flipkart orange for headings */
+}
+
+a {
+  color: #ff4d00; /* Orange links */
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ff7a33; /* Lighter orange for hover effect */
+  text-decoration: underline;
+}
+
+button, .btn {
+  background-color: #ff4d00; /* Flipkart orange for buttons */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover, .btn:hover {
+  background-color: #e64500; /* Darker orange on hover */
+}
+
+button:disabled, .btn:disabled {
+  background-color: #333;
+  cursor: not-allowed;
+}
+
+/* Table and Column Styling */
+.index_page .table_for th, .show_page .table_for th {
+  background-color: #333333;
+  color: #f5f5f5;
+  padding: 12px 20px;
+  text-align: left;
+}
+
+.index_page .table_for td, .show_page .table_for td {
+  background-color: #444444;
+  color: #f5f5f5;
+  padding: 12px 20px;
+  text-align: left;
+  border-bottom: 1px solid #666666;
+}
+
+.index_page .table_for tr:hover, .show_page .table_for tr:hover {
+  background-color: #555555;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-row:hover {
+  background-color: #666666;
+}
+
+/* Product Image Styling */
+.product-thumb {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.product-thumb:hover {
+  transform: scale(1.05);
+}
+
+/* Category and Created At Columns */
+.category-column, .created-at-column {
+  font-weight: bold;
+  font-size: 16px;
+  color: #ff4d00;
+}
+
+.category-column {
+  text-transform: capitalize;
+}
+
+.created-at-column {
+  color: #aaa;
+}
+
+/* "No Image Available" Style */
+.no-image {
+  width: 100%;
+  height: 180px;
+  background-color: #333;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+  font-size: 14px;
+  font-style: italic;
+  border: 2px dashed #666;
+}
+
+/* Responsive Design for Smaller Screens */
+@media only screen and (max-width: 768px) {
+  .product-thumb {
+    width: 100%;
+    max-width: 150px;
+  }
+
+  .clickable-table td, .clickable-table th {
+    padding: 10px;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  .category-column, .created-at-column {
+    font-size: 14px;
+  }
+}
+
+
+
+
+
+
+
+
+.signup-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.signup-form {
+  max-width: 500px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.radio-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 5px;
+}
+
+.radio-group label {
+  font-weight: normal;
+}
+
+.form-actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.form-actions input[type="submit"] {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.form-actions input[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.devise-links {
+  text-align: center;
+  margin-top: 15px;
+}
