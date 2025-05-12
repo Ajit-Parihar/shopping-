@@ -22,7 +22,7 @@ validates :town, presence: { message: "Town is required" },
 validates :gali_no, presence: { message: "Gali Number is required" },
                     format: { with: /\A[0-9]{1,3}\z/, message: "Gali Number must be 1-3 digits" }
 
-validates :house_no, presence: { message: "House Number is required" },
+validates :house_no, presence: { message: "House Number is required and it is Number" },
                      format: { with: /\A[0-9]{1,3}\z/, message: "House Number must be 1-3 digits" }
 
 

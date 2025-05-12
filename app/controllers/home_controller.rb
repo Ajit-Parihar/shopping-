@@ -12,7 +12,7 @@ class HomeController < ApplicationController
 
   private
   def check 
-    puts current_admin_user.inspect
+ 
     if current_admin_user
        redirect_to admin_businesses_path 
     end

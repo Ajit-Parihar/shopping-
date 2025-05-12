@@ -30,8 +30,8 @@ ActiveAdmin.register Transaction do
     t.product.rating || "Rating Not Fount"
    end
 
-   column "Transaction" do |t|
-      t.amount
+   column "Price" do |t|
+      t.product.price
    end 
    actions
   end
@@ -56,12 +56,11 @@ ActiveAdmin.register Transaction do
       column "Rating" do |res|
         res.product.rating || "Rating Not Fount"
        end
-
     end
     end
-
-     table_for Order.where(product_id: resource.product_id, seller_id: resource.seller_id) do 
-         column "user" do |order|
+    orders = Order.where(product_id: resource.product_id, seller_id: resource.seller_id)
+     table_for orders do 
+         column "user" do |order| 
           order.user.first_name + " " + order.user.last_name
          end
         
@@ -81,8 +80,12 @@ ActiveAdmin.register Transaction do
              order.user_address.full_address
          end
         end
-         div do 
-            span "Total Transaction: ₹ #{res.amount}"
-         end
+
+        total_transaction = orders.sum { |order| order.product.price * order.quantity }
+
+        div style: "margin-top: 20px; font-weight: bold;" do
+          span "Total Transaction: ₹ #{total_transaction}"
+        end
+        
    end
 end

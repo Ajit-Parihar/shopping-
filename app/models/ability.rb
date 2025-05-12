@@ -19,19 +19,19 @@ class Ability
       can :read, UserAddress
       can :manage, ActiveAdmin::Page, :name => "OrderTracker"
       can :manage, ActiveAdmin::Page, :name => "Profile"
-      can :manage, AdminUser
-      can :read, Transaction  
-     else 
+      can [:edit, :update], AdminUser
+      can :read, Transaction
+     else
 
       can :manage, ActiveAdmin::Page, :name => "AddToCard"
       can :manage, ActiveAdmin::Page, :name => "Buy"
       can :manage, UserAddress
       can :read, Business
       can :read, Product
-      can :buy_product, Product        
+      can :buy_product, Product
       can :read, Order
       can :manage, Rating
-      can :manage, AdminUser
+      can [:edit, :update], AdminUser
       can :manage, ActiveAdmin::Page, :name => "OrderTracker"
       can :manage, ActiveAdmin::Page, :name => "Profile"
      end

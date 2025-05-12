@@ -2,9 +2,9 @@ ActiveAdmin.register AdminUser do
 
   permit_params :first_name, :last_name, :email, :password, :password_confirmation, :user_type
 
-  menu if: proc { current_admin_user.admin?  }
+  menu if: proc { current_admin_user.admin? }
+  
 
-  # batch_action :destroy, false 
 
   
   batch_action :send_welcome_email do |selected_ids|

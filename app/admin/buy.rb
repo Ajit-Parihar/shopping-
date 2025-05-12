@@ -1,7 +1,6 @@
 
 ActiveAdmin.register_page "Buy" do
   menu false
-
   content title: "Buy" do
     product = Product.find(params[:product_id])
     status = params[:status]
@@ -37,7 +36,6 @@ ActiveAdmin.register_page "Buy" do
           image_tag(p.image, style: "max-width: 100px;")
         end
 
-      #  puts addToCard
         if addTocard
         column "Quantity + Total" do |p|
           render partial: "admin/quantity_total", locals: { cart: addTocard }

@@ -83,7 +83,6 @@ filter :status_type, as: :select, collection: -> {
       end
 
       column "Details" do |order|
-        # link_to "Check Order", admin_ordertracker_path(order_id: order.id), class: "button"
        link_to "Check Order", admin_order_path(order.id), class: "button"
 
       end
@@ -95,8 +94,21 @@ filter :status_type, as: :select, collection: -> {
         attributes_table do
           row :id
           row :status_type
-          row :created_at
-          row :updated_at
+          row "Order Placed" do |resource|
+            resource.created_at.strftime("%B %d, %Y %I:%M")
+          end
+         if resource.status_type == "delivered"
+          row "Order Deliver" do |resource|
+            resource.updated_at.strftime("%B %d, %Y %I:%M") 
+          end
+        else
+          row "Order Status" do |resource|
+                resource.status_type
+          end 
+        end
+          row "Order Deliver Address" do |resource|
+              resource.user_address.full_address
+          end 
         end
     
         panel "Order Progress Overview" do
@@ -151,6 +163,13 @@ filter :status_type, as: :select, collection: -> {
     
         panel "Deliver Product Details" do
           table_for resource.product do
+
+            column "Image" do |p|
+              link_to admin_product_path(p.id) do
+                image_tag(p.image, style: "max-width: 100px;")
+              end
+            end
+
             column :name
             column :brand_name
     
@@ -162,21 +181,19 @@ filter :status_type, as: :select, collection: -> {
               number_to_currency(p.price, unit: "₹")
             end
 
+            column "Qunatity" do 
+              resource.quantity
+            end
+
             column "Seller" do |p|
                  resource.seller.first_name
-            end
-    
-            column "Image" do |p|
-              link_to admin_product_path(p.id) do
-                image_tag(p.image, style: "max-width: 100px;")
-              end
             end
          end
       end
     end
 
   member_action :cancel_order, method: :post do
-      puts resource.inspect
+     
       resource.update(status_type: "cancelled")
       redirect_to admin_order_path(resource.id), notice: "Order Cancel Succssfully"
   end

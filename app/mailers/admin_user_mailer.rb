@@ -4,7 +4,7 @@ class AdminUserMailer < ApplicationMailer
    
   def welcome_email(admin_user)
     @admin_user = admin_user
-    @url  = "http://example.com/login"
+    # @url  = "http://example.com/login"
     mail(to: @admin_user.email, subject: "Welcome to My Awesome Site")
   end
 

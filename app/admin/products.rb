@@ -31,19 +31,14 @@ ActiveAdmin.register Product do
       else
         Product.where(deleted_at: nil)
       end
+    end
   end
-  
-
-  end
-
-  
   form do |f|
     f.inputs "Product Details" do
       f.input :name
       f.input :price
       f.input :brand_name
       f.input :discription
-    
       f.input :image, as: :file
       f.input :business_id,
               as: :radio,
@@ -71,7 +66,6 @@ ActiveAdmin.register Product do
     column "Rating" do |product|
       product.rating || "Rating Not found"
     end
-   
 
 actions defaults: false do |product|
   item "View", resource_path(product), class: "member_link"
@@ -141,24 +135,16 @@ end
 
   member_action :buy_product, method: :post do
     if UserAddress.find_by(user_id: current_admin_user.id) && params[:address_id]
-      quantity = params[:quantity].to_i
-      puts "quantity print"
-      
-      puts quantity.inspect
-      
-      address_id = params[:address_id].to_i
-      
-
-      order = Order.create_order(current_admin_user, resource, quantity, address_id)
-
+        quantity = params[:quantity].to_i
+        address_id = params[:address_id].to_i
+        order = Order.create_order(current_admin_user, resource, quantity, address_id)
         redirect_to admin_orders_path, notice: "Product bought Successfully"
     else
         redirect_to admin_buy_path(product_id: resource.id), alert: "No Address found"
     end
   end
   member_action :restore, method: :put do
-    resource.restore_with_dependents
+    resource.restore_with_dependents  
     redirect_to admin_products_path, notice: "Product and related records restored successfully!"
   end
-  
 end

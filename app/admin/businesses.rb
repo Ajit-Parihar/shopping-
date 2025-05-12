@@ -2,7 +2,8 @@ ActiveAdmin.register Business do
 
   config.batch_actions = false
   config.filters = false  
-  # permit_params :category, :created_at, :updated_at
+
+
 
   menu label: proc {
     if current_admin_user.seller?
@@ -25,7 +26,7 @@ ActiveAdmin.register Business do
               .joins("INNER JOIN seller_products ON seller_products.business_id = businesses.id")
               .where(seller_products: { seller_id: current_admin_user.id })
               .where(products: { deleted_at: nil })
-              .distinct  #samjhana he 
+              .distinct
       end
     end
   end
@@ -61,7 +62,7 @@ ActiveAdmin.register Business do
 
   show do |res|
     panel "Products", class: "fade-in-section" do
-      table_for res.products.where(deleted_at: nil), class: "clickable-table" do
+      table_for res.products, class: "clickable-table" do
             column :image do |product|
           if product.image.attached?
             image_tag url_for(product.image), alt: product.name, style: "max-width: 300px;", class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
@@ -75,7 +76,10 @@ ActiveAdmin.register Business do
         column "Rating" do |product|
           product.rating || "Rating Not found"
         end
+         column "view" do |product|
+          span link_to("View Product", admin_product_path(product), class: "button cart-button")
       end
+     end
     end
   end
 end

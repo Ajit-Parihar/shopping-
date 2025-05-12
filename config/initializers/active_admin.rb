@@ -13,6 +13,14 @@ ActiveAdmin.setup do |config|
   #     menu.add label: "My Profile", url: "/admin/profile", html_options: { target: :self }
   #   end
   # end
+  
+  config.namespace :admin do |admin|
+    admin.build_menu :utility_navigation do |menu|
+      menu.add label: "Seller Dashboard", url: "/admin/profile", if: proc {
+        controller.current_admin_user.seller?
+      }
+    end
+  end
 
   config.namespace :admin do |admin|
     admin.build_menu :utility_navigation do |menu|
@@ -20,8 +28,6 @@ ActiveAdmin.setup do |config|
     end
   end
 
-
-  
   config.site_title = "Business Management2"
 
   # Set the link url for the title. For example, to take
@@ -151,9 +157,9 @@ ActiveAdmin.setup do |config|
   #
   # Set the action to call for the root path. You can set different
   # roots for each namespace.
-  
+
   # Default:
-  config.root_to = 'businesses#index'
+  config.root_to = "businesses#index"
 
   # == Admin Comments
   #
@@ -178,7 +184,7 @@ ActiveAdmin.setup do |config|
   # == Batch Actions
   #
   # Enable and disable Batch Actions
-  
+
   config.batch_actions = true
 
   # == Controller Filters
@@ -193,14 +199,14 @@ ActiveAdmin.setup do |config|
   # You can exclude possibly sensitive model attributes from being displayed,
   # added to forms, or exported by default by ActiveAdmin
   #
-  config.filter_attributes = [:encrypted_password, :password, :password_confirmation]
+  config.filter_attributes = [ :encrypted_password, :password, :password_confirmation ]
 
   # == Localize Date/Time Format
   #
   # Set the localize format to display dates and times.
   # To understand how to localize your app with I18n, read more at
   # https://guides.rubyonrails.org/i18n.html
-  
+
   # You can run `bin/rails runner 'puts I18n.t("date.formats")'` to see the
   # available formats in your application.
   #

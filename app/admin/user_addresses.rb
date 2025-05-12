@@ -22,14 +22,9 @@ ActiveAdmin.register UserAddress do
                .where(orders: { seller_id: current_admin_user.id })
                .distinct
                .map { |user| ["#{user.first_name} #{user.last_name} (#{user.email})", user.id] }
-    else
-      AdminUser.where(user_type: 'user')
-               .map { |user| ["#{user.first_name} #{user.last_name} (#{user.email})", user.id] }
     end
   }, label: "Users who ordered from you"
   
-
-
   form do |f|
      f.inputs "Address Details" do
       f.input :country, as: :select, selected: "India", collection: ['India'] 
@@ -40,7 +35,6 @@ ActiveAdmin.register UserAddress do
       f.input :gali_no
       f.input :house_no
       f.input :user_id, as: :hidden, input_html: { value: current_admin_user.id }
-      f.input :product_id, as: :hidden, input_html: { value: params[:product_id] }
     end
     f.actions
   end
@@ -65,7 +59,7 @@ ActiveAdmin.register UserAddress do
       row :block
       row :town
       row :gali_no
-      row :house_no
+      row :house_no 
     end
   end
 end

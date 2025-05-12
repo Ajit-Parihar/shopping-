@@ -30,8 +30,7 @@ class Order < ApplicationRecord
 
     def self.create_order(user, product, quantity, address_id)
       seller_product = SellerProduct.find_by(product_id: product.id)
-      puts 'quantity model'
-       puts quantity.class
+   
       order = Order.create(
         user_id: user.id,
         product_id: product.id,

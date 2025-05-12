@@ -11,21 +11,21 @@ class Product < ApplicationRecord
   has_one_attached :image
 
 
-
-
-
+  
   def restore_with_dependents
     restore
     reload
-
-
     # Restore dependent records
+
     orders.only_deleted.each(&:restore)
     ratings.only_deleted.each(&:restore)
     add_to_cards.only_deleted.each(&:restore)
     transactions.only_deleted.each(&:restore)
     seller_products.only_deleted.each(&:restore)
   end
+
+
+
 
 
   validates :name, presence: { message: "Product name can't be blank." }, 
@@ -42,12 +42,23 @@ class Product < ApplicationRecord
 
   validates :business_id, presence: { message: "Product category must be selected." }
 
-  # # Image validation
-  # validates :image,
-  #           attached: true,
-  #           content_type: { in: ['image/png', 'image/jpeg'], message: "must be PNG or JPEG" },
-  #           size: { less_than: 5.megabytes, message: "should be under 5MB" }
-  
+
+  validate :image_presence_and_format
+
+private
+
+def image_presence_and_format
+  if image.attached?
+    if !image.content_type.in?(%w[image/png image/jpg image/jpeg])
+      errors.add(:image, "must be a PNG, JPG, or JPEG file.")
+    elsif image.byte_size > 5.megabytes
+      errors.add(:image, "should be less than 5MB.")
+    end
+  else
+    errors.add(:image, "must be attached.")
+  end
+end
+
   after_create :create_seller_product
 
   private

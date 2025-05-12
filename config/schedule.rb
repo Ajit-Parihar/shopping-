@@ -1,4 +1,3 @@
-every 1.minutes do
-  rake "products:cleanup_soft_deleted"
+every 1.minute do
+  rake "cleanup:old_soft_deleted_products", environment: "production"
 end
-  

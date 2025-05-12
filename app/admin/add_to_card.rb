@@ -13,7 +13,6 @@ ActiveAdmin.register_page "AddToCard" do
           cart.quantity = 1
           cart.product_id = product.id
       end
-
   end
   
   products = Product.joins(:add_to_cards).where(add_to_cards: { admin_user_id: current_admin_user.id }).distinct
@@ -29,11 +28,10 @@ ActiveAdmin.register_page "AddToCard" do
         column "Price" do |product|
           number_to_currency(product.price, unit: "₹")
         end
-
   
         column "Quantity + Total" do |product|
 
-  cart_item = AddToCard.find_by(admin_user_id: current_admin_user.id, product_id: product.id)
+      cart_item = AddToCard.find_by(admin_user_id: current_admin_user.id, product_id: product.id)
       if cart_item
          render partial: "admin/quantity_total", locals: { cart: cart_item }
       else
@@ -41,7 +39,7 @@ ActiveAdmin.register_page "AddToCard" do
        end       
      end
         column "Actions" do |product|
-          span link_to("Buy", admin_buy_path(product_id: product.id), class: "button buy-button", onclick: "event.stopPropagation()")
+          span link_to("Buy", admin_buy_path(product_id: product.id), class: "button buy-button")
         end 
       end
     end
