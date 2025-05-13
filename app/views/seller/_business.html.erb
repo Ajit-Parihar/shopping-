@@ -1,0 +1,16 @@
+<div class="businesses-container">
+  <% businesses.each do |business| %>
+    <div class="business-card">
+      <% category = business.category.to_sym %>
+      <% image_url = Rails.application.config.images_hash[category] %>
+
+      <% if image_url.present? %>
+        <%= image_tag image_url, alt: "#{business.category} Image", class: "product-thumb" %>
+      <% else %>
+        <div class="no-image">No image available</div>
+      <% end %>
+
+      <div class="business-category"><%= business.category.capitalize %></div>
+    </div>
+  <% end %>
+</div>

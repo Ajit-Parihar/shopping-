@@ -3,14 +3,13 @@ ActiveAdmin.register Product do
 
   config.clear_action_items!
 
-  action_item :create_product, only: :index do
-    if current_admin_user.seller?
-      link_to 'New Product', new_admin_product_path
-    end
-  end
+  # action_item :create_product, only: :index do
+  #   if current_admin_user.seller?
+  #     link_to 'New Product', new_admin_product_path
+  #   end
+  # end
 
   scope :all, default: true
-
   permit_params :name, :price, :brand_name, :discription, :image, :business_id, :rating, :seller_id
   filter :name
   filter :brand_name
@@ -19,23 +18,26 @@ ActiveAdmin.register Product do
   controller do
     def scoped_collection
       if current_admin_user.admin?
- 
         Product.with_deleted
-  
-      elsif current_admin_user.seller?
-        Product.joins(:seller_products)
-               .where(seller_products: { seller_id: current_admin_user.id })
-               .where(deleted_at: nil)
-               .distinct
-   
-      else
+        elsif current_admin_user.seller?
+          seller_product_ids = SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id)
+          Product.where.not(id: seller_product_ids)
+        else
         Product.where(deleted_at: nil)
+      end
+    end
+
+    def show
+      @product = Product.find_by(id: params[:id])
+    
+      if @product.nil?
+        redirect_to admin_products_path, alert: "Product not found."
       end
     end
   end
   form do |f|
     f.inputs "Product Details" do
-      f.input :name
+      f.input :name 
       f.input :price
       f.input :brand_name
       f.input :discription
@@ -69,19 +71,6 @@ ActiveAdmin.register Product do
 
 actions defaults: false do |product|
   item "View", resource_path(product), class: "member_link"
-  
-  if can?(:manage, product) 
-    item "Edit", edit_resource_path(product), class: "member_link"
-  end
-
-  unless product.deleted_at.present?
-    if can?(:destroy, product) 
-      item "Delete", resource_path(product),
-           method: :delete,
-           data: { confirm: "Are you sure?" },
-           class: "member_link delete_link"
-    end
-  end
 
   if product.deleted_at.present?
     if can?(:update, product) 
@@ -91,7 +80,7 @@ actions defaults: false do |product|
            class: "member_link"
     end
   end
-end
+ end
 end
 
   show do |res|
@@ -103,7 +92,7 @@ end
       column :price
       column :brand_name
       column :discription
-      unless current_admin_user.admin? || current_admin_user.seller?
+      unless current_admin_user.admin? 
       column "Buy" do |res|
         span link_to("Buy", admin_buy_path(product_id: res.id), class: "button buy-button")
       end 
@@ -111,7 +100,7 @@ end
        span link_to("Add to Cart", admin_addtocard_path(product_id: res), class: "button cart-button")
       end
     end
-    end
+  end
     
     rating = Rating.where(product_id: product.id)
     unless rating.empty?

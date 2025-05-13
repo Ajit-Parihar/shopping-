@@ -7,7 +7,7 @@ Rails.application.routes.draw do
 devise_for :admin_users, ActiveAdmin::Devise.config.merge(
   controllers: {
     registrations: 'admin/registrations',
-    # passwords: 'admin/passwords' 
+    # passwords: 'admin/passwords'
   }
 )
 

@@ -1,24 +1,26 @@
 <h1>All Products</h1>
+
 <div class="products-container">
   <% @products.each do |product| %>
-    <div class="product-card">
+    <%= link_to admin_user_session_path, class: "product-card-link" do %>
+      <div class="product-card">
         <% if product.image.attached? %>
-        <%= image_tag url_for(product.image), alt: product.name %>
-      <% else %>
-        <p>No image available</p>
-      <% end %>
-      <h2><%= product.name %></h2>
-      <p><strong>Brand:</strong> <%= product.brand_name %></p>
-      <p><strong>Price:</strong> ₹<%= product.price %></p>
-      <p><strong>Description:</strong> <%= product.discription %></p>
-      <p><strong>Rating:</strong> <%= product.rating %> ⭐</p>
+          <%= image_tag url_for(product.image), alt: product.name %>
+        <% else %>
+          <p>No image available</p>
+        <% end %>
 
-    
+        <h2><%= product.name %></h2>
+        <p><strong>Brand:</strong> <%= product.brand_name %></p>
+        <p><strong>Price:</strong> ₹<%= product.price %></p>
+        <p><strong>Description:</strong> <%= product.discription %></p>
+        <p><strong>Rating:</strong> <%= product.rating %> ⭐</p>
 
-      <div class="product-buttons">
-        <%= link_to "Buy", admin_user_session_path %>
-        <%= link_to "Add To Cart", admin_user_session_path %>
+        <div class="product-buttons">
+          <span class="fake-button">Buy</span>
+          <span class="fake-button">Add To Cart</span>
+        </div>
       </div>
-    </div>
+    <% end %> 
   <% end %>
 </div>

@@ -1,0 +1,21 @@
+<div class="transactions-container">
+  <% transactions.each do |transaction| %>
+    <div class="transaction-card">
+      <% if transaction.product.image.attached? %>
+        <%= image_tag url_for(transaction.product.image), alt: "Product Image", class: "product-image" %>
+      <% else %>
+        <p>Image not present</p>
+      <% end %>
+
+      <div class="product-name"><%= transaction.product.name %></div>
+      <div class="brand-name"><%= transaction.product.brand_name %></div>
+
+      <% if transaction.product.rating.present? %>
+        <div class="rating">Rating: <%= transaction.product.rating %> ⭐</div>
+      <% else %>
+        <div class="no-rating">Rating Not Found</div>
+      <% end %>
+         <%= link_to "View Details", admin_transaction_path(transaction), class: "transaction-link" %>
+    </div>
+  <% end %> 
+</div>

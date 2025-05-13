@@ -6,10 +6,6 @@ ActiveAdmin.register UserAddress do
     def scoped_collection
       if current_admin_user.admin? 
         UserAddress.all
-      elsif current_admin_user.seller?
-        UserAddress.joins(:orders)
-        .where(orders: { seller_id: current_admin_user.id })
-        .distinct
       else
         UserAddress.where(user_id: current_admin_user.id)
       end

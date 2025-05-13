@@ -1,0 +1,14 @@
+<div class="orders-container">
+  <% orders.each do |order| %>
+    <div class="order-card">
+      <% if order.product.image.attached? %>
+        <%= image_tag url_for(order.product.image) %>
+      <% end %>
+
+      <div class="product-name"><%= order.product.name %></div>
+      <div class="user-name"><%= "#{order.user.first_name} #{order.user.last_name}" %></div>
+      <div class="status"><%= order.status_type %></div>
+      <%= link_to "Check Order", admin_order_path(order.id), class: "order-link" %>
+    </div>
+  <% end %>
+</div>

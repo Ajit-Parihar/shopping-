@@ -3,12 +3,8 @@ ActiveAdmin.register Business do
   config.batch_actions = false
   config.filters = false  
 
-
-
   menu label: proc {
-    if current_admin_user.seller?
-      "My Business"
-    elsif current_admin_user.admin?
+    if current_admin_user.admin?
       "All Business"
     else
       "Home"
@@ -18,17 +14,32 @@ ActiveAdmin.register Business do
   scope :all, default: true
 
   controller do
+    #  before_action :store_referrer
+    # @path = false
+    #   def store_referrer
+    #     session[:previous_page] = request.referer
+    #     puts session[:previous_page]
+    #     if session[:previous_page] == "http://[::1]:3000/admin/sellerdashboard"
+    #       @path = true
+    #     else
+    #       puts "No referrer found."
+    #     end
+    #   end
+
     def scoped_collection
       if current_admin_user.admin? || current_admin_user.user?
         Business.joins(:products).distinct
       else
-      Business.joins(:products)
-              .joins("INNER JOIN seller_products ON seller_products.business_id = businesses.id")
-              .where(seller_products: { seller_id: current_admin_user.id })
-              .where(products: { deleted_at: nil })
-              .distinct
+        Business.joins(:products)
+                .joins("INNER JOIN seller_products ON seller_products.business_id = businesses.id")
+                .where(products: { deleted_at: nil })
+                .where.not(seller_products: { seller_id: current_admin_user.id })
+                .distinct
       end
     end
+
+    def show
+    end 
   end
 
   index row_class: ->(business) { "clickable-row" } do
@@ -48,12 +59,6 @@ ActiveAdmin.register Business do
 
     column :category
     column :created_at
- 
-    unless current_admin_user.user?
-      column "Orders" do |business|
-        link_to "View Orders", admin_orders_path(business_id: business.id)
-      end
-    end
 
     column "" do |business|
       content_tag(:span, "", class: "row-link", data: { href: admin_business_path(business) })
@@ -62,24 +67,35 @@ ActiveAdmin.register Business do
 
   show do |res|
     panel "Products", class: "fade-in-section" do
-      table_for res.products, class: "clickable-table" do
-            column :image do |product|
+      products = if current_admin_user.seller?
+                   res.products
+                     .joins(:seller_products)
+                     .where.not(seller_products: { seller_id: current_admin_user.id })
+                     .distinct
+                 else
+                   res.products
+                 end
+
+      table_for products, class: "clickable-table" do
+        column :image do |product|
           if product.image.attached?
             image_tag url_for(product.image), alt: product.name, style: "max-width: 300px;", class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
           else
             "No image"
           end
         end
+
         column :name
         column :price
         column :brand_name
         column "Rating" do |product|
           product.rating || "Rating Not found"
         end
-         column "view" do |product|
+
+        column "view" do |product|
           span link_to("View Product", admin_product_path(product), class: "button cart-button")
+        end
       end
-     end
     end
   end
 end

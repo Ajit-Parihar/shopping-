@@ -6,7 +6,7 @@ class Order < ApplicationRecord
   belongs_to :user_address, class_name: "UserAddress", foreign_key: "address_id"
   belongs_to :seller, class_name: 'AdminUser'
   belongs_to :business
-  has_one :rating, dependent: :destroy  # Cascade destroy the associated rating
+  has_one :rating, dependent: :destroy 
 
 
 

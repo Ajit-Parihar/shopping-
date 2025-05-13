@@ -1,4 +1,5 @@
 ActiveAdmin.register Transaction do
+  menu false
    permit_params :seller_id, :product_id, :amount
    config.batch_actions =false
    filter :product
@@ -54,7 +55,7 @@ ActiveAdmin.register Transaction do
       end
 
       column "Rating" do |res|
-        res.product.rating || "Rating Not Fount"
+        res.product.rating || "Rating Not Found"
        end
     end
     end
@@ -86,6 +87,5 @@ ActiveAdmin.register Transaction do
         div style: "margin-top: 20px; font-weight: bold;" do
           span "Total Transaction: ₹ #{total_transaction}"
         end
-        
    end
 end

@@ -48,7 +48,11 @@ ActiveAdmin.register Rating do
       f.input :comments, as: :text, input_html: { rows: 6, cols: 60 }
       f.input :photos, as: :file, input_html: { multiple: true, name: "rating[photos][]" }
     end
-    f.actions
+
+    f.actions do
+      f.action :submit, label: "Create Rating"
+      f.cancel_link(admin_orders_path) # Redirect to profile show page instead of index
+    end
   end
 
    show do

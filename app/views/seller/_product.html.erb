@@ -1,0 +1,20 @@
+<%= link_to "Create Product", new_admin_product_path, class: "create-product-button" %>
+    
+<div class="products-container">
+
+  <% products.each do |product| %>
+    <div class="product-card">
+      <% if product.image.attached? %>
+        <%= image_tag url_for(product.image), alt: "#{product.name}", class: "product-thumb" %>
+      <% else %>
+        <p>No image for <%= product.name %></p>
+      <% end %>
+
+      <div class="product-name"><%= product.name %></div>
+      <div class="product-brand"><%= product.brand_name %></div>
+      <div class="product-price">₹<%= product.price %></div>
+      <div class="product-description"><%= product.discription %></div>
+    </div>
+  <% end %>
+
+</div>

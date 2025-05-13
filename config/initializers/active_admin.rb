@@ -14,19 +14,22 @@ ActiveAdmin.setup do |config|
   #   end
   # end
   
+  
+   config.namespace :admin do |admin|
+  admin.build_menu :utility_navigation do |menu|
+    menu.add label: "My Profile", url: "/admin/profile"
+  end
+end
+  
   config.namespace :admin do |admin|
     admin.build_menu :utility_navigation do |menu|
-      menu.add label: "Seller Dashboard", url: "/admin/profile", if: proc {
-        controller.current_admin_user.seller?
+      menu.add label: "Seller Dashboard", url: "/admin/sellerdashboard", if: proc {
+        controller.current_admin_user.seller? 
       }
     end
   end
 
-  config.namespace :admin do |admin|
-    admin.build_menu :utility_navigation do |menu|
-      menu.add label: "My Profile", url: "/admin/profile"
-    end
-  end
+
 
   config.site_title = "Shopping"
 
