@@ -14,6 +14,8 @@ ActiveAdmin.setup do |config|
   #   end
   # end
   
+  # config.authentication_method = false
+  # config.current_user_method = :fake_admin_user
   
    config.namespace :admin do |admin|
   admin.build_menu :utility_navigation do |menu|
@@ -99,7 +101,7 @@ end
   # This setting changes the method which Active Admin calls
   # within the application controller.
   config.authentication_method = :authenticate_admin_user!
-  # config.authentication_method = nil
+  # config.authentication_method = false
 
   # == User Authorization
   #
@@ -137,6 +139,8 @@ end
   # This setting changes the method which Active Admin calls
   # (within the application controller) to return the currently logged in user.
   config.current_user_method = :current_admin_user
+  # config.current_user_method = :fake_admin_user
+
 
   # == Logging Out
   #

@@ -10,7 +10,6 @@ devise_for :admin_users, ActiveAdmin::Devise.config.merge(
     # passwords: 'admin/passwords'
   }
 )
-
   ActiveAdmin.routes(self)
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -28,8 +27,11 @@ devise_for :admin_users, ActiveAdmin::Devise.config.merge(
    root "home#index"
    get "product/:id", to: "home#product", as: "product"
    patch 'add_to_cards/:product_id/update_quantity', to: 'add_to_cards#update_quantity', as: 'update_cart_quantity'
+   post "AddToCart/:id", to: "home#addToCart", as: "addToCart"
+   get "cart", to: "home#cart", as: "cart"
+   post "/update_cart_quantity/:id", to: "home#update_cart_quantity"
+   post "/addtocart/remove/:id", to: "home#addtocart_remove", as: "addtocart_remove"
 
   # get "page/not_found", to: "errors#not_found"
   # get "page/unauthorized", to: "errors#unauthorized"
-  
 end

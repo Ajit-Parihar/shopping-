@@ -3,6 +3,8 @@
     <a href="/" class="nav-brand">MyStore</a>
   </div>
   <div class="nav-right">
+        <%=link_to "Your Cart", cart_path, class: "nav-link"%>
+
     <% if admin_user_signed_in? %>
       <a href="/admin/logout" class="nav-link">Logout</a>
     <% else %>

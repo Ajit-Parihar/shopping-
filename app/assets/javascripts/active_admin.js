@@ -66,13 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // document.querySelectorAll(".update").forEach((button)=>{
-    //    button.addEventListener("click", function(){
-    //        let cartId = this.dataset.id;
-    //        console.log(this.dataset)
-    //        console.log(cartId)
-    //    })
-    // })
+
   
     document.querySelectorAll(".increase-btn").forEach((button) => {
       button.addEventListener("click", function () {
@@ -80,11 +74,30 @@ document.addEventListener("DOMContentLoaded", () => {
         let quantityElement = document.getElementById(`quantity-${productId}`);
         let totalPriceElement = document.getElementById(`total-pay-${productId}`);
         let pricePerUnit = parseFloat(totalPriceElement.dataset.price);
-  
+        console.log(productId)
         let quantity = parseInt(quantityElement.innerText);
         quantity += 1;
         quantityElement.innerText = quantity;
         totalPriceElement.innerText = (quantity * pricePerUnit).toFixed(2);
+
+  if (window.location.pathname.split("/")[1] == "cart"){
+        const url = window.location.pathname; 
+        const segments = url.split("/");      
+        const product = segments[segments.length - 1]; 
+        console.log(product); 
+
+        fetch(`/update_cart_quantity`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+          },
+          body: JSON.stringify({ id: product, quantity: quantity })
+        }).then(response => {
+          if (!response.ok) throw new Error("Failed to update cart");
+        }).catch(console.error);
+      }
+      
         updateQuantityInDB(productId, quantity)
         updateGrandTotal();
       });
@@ -103,6 +116,25 @@ document.addEventListener("DOMContentLoaded", () => {
           quantityElement.innerText = quantity;
           totalPriceElement.innerText = (quantity * pricePerUnit).toFixed(2);
         }
+
+        if (window.location.pathname.split("/")[1] == "cart"){
+          const url = window.location.pathname; 
+          const segments = url.split("/");      
+          const product = segments[segments.length - 1]; 
+          console.log(product); 
+  
+          fetch(`/update_cart_quantity`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({ id: product, quantity: quantity })
+          }).then(response => {
+            if (!response.ok) throw new Error("Failed to update cart");
+          }).catch(console.error);
+        }
+  
    
         updateQuantityInDB(productId, quantity)
         updateGrandTotal();
@@ -146,7 +178,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function productRating(rating){
-  //  console.log(rating)
    
    const orderId = rating.dataset.id
    window.location.href = `/admin/ratings/new?order_id=${orderId}`
@@ -160,9 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const quantitySpan = document.getElementById(`quantity-${id}`);
       const totalSpan = document.getElementById(`total-pay-${id}`);
       const price = parseFloat(totalSpan.dataset.price);
-      // console.log(quantitySpan)
       let quantity = parseInt(quantitySpan.textContent);
-      //  console.log(quantity)
       quantitySpan.textContent = quantity;
       totalSpan.textContent = (quantity * price).toFixed(2);
     });
@@ -190,7 +219,6 @@ function product(item){
   let parsedUrl = new URL(urlString);
   let orderId = parsedUrl.searchParams.get("order_id");
   
-  // console.log(orderId)
 
   window.location.href = `/admin/products/${orderId}`
 

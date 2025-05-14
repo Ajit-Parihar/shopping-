@@ -1,5 +1,6 @@
 ActiveAdmin.register Business do
 
+
   config.batch_actions = false
   config.filters = false  
 

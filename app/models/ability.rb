@@ -37,7 +37,6 @@ class Ability
       can :buy_product, Product
       can :read, Order
       can :manage, Rating
-      # can :read, AdminUser
       can [:read, :update], AdminUser
       can :manage, ActiveAdmin::Page, :name => "OrderTracker"
       can :manage, ActiveAdmin::Page, :name => "Profile"

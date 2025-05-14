@@ -1,0 +1,35 @@
+<nav class="custom-navbar">
+  <div class="nav-left">
+    <a href="/" class="nav-brand">MyStore</a>
+  </div>
+  <div class="nav-right">
+        <%=link_to "Your Cart", cart_path, class: "nav-link"%>
+
+    <% if admin_user_signed_in? %>
+      <a href="/admin/logout" class="nav-link">Logout</a>
+    <% else %>
+      <a href="/admin/login" class="nav-link">Login</a>
+      <a href ="admin/sign_up" class="nav-link">Sign UP</a>
+    <% end %>
+  </div>
+</nav>
+
+<div class="cart-container">
+  <% @products_in_cart.each do |item| %>
+    <div class="cart-item">
+      <div class="cart-image">
+        <%= image_tag url_for(item[:product].image) if item[:product].image.attached? %>
+      </div>
+      <div class="cart-details">
+        <strong><%= item[:product].name %></strong><br>
+        Brand: <%= item[:product].brand_name %><br>
+        Price: ₹<%= item[:product].price %><br>
+        Quantity: <%= item[:quantity] %>
+        <%=puts "print #{item.inspect}"%>
+        <%= render partial: "admin/quantitywithoutlogin", locals: { cart: item } %>
+      </div>
+         <%= link_to "remove", addtocart_remove_path(item[:product]), method: :post %>
+    </div>
+
+  <% end %>
+</div>
