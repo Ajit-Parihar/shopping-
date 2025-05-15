@@ -29,9 +29,9 @@ devise_for :admin_users, ActiveAdmin::Devise.config.merge(
    patch 'add_to_cards/:product_id/update_quantity', to: 'add_to_cards#update_quantity', as: 'update_cart_quantity'
    post "AddToCart/:id", to: "home#addToCart", as: "addToCart"
    get "cart", to: "home#cart", as: "cart"
-   post "/update_cart_quantity/:id", to: "home#update_cart_quantity"
+   post "/update_cart_quantity", to: "home#update_cart_quantity", as: "update_quantity"
    post "/addtocart/remove/:id", to: "home#addtocart_remove", as: "addtocart_remove"
-
+   get "/product/show/:id", to: "home#product_show", as: "product_show"
   # get "page/not_found", to: "errors#not_found"
   # get "page/unauthorized", to: "errors#unauthorized"
 end

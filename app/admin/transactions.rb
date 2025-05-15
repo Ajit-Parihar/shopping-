@@ -6,7 +6,11 @@ ActiveAdmin.register Transaction do
 
    controller do 
      def scoped_collection
+        if current_admin_user.seller?
          Transaction.where(seller_id: current_admin_user.id)
+        elsif current_admin_user.admin?
+            Transaction.all
+        end
      end
    end
    index do

@@ -1,8 +1,7 @@
 ActiveAdmin.register Business do
 
-
   config.batch_actions = false
-  config.filters = false  
+  config.filters = false
 
   menu label: proc {
     if current_admin_user.admin?
@@ -38,9 +37,6 @@ ActiveAdmin.register Business do
                 .distinct
       end
     end
-
-    def show
-    end 
   end
 
   index row_class: ->(business) { "clickable-row" } do

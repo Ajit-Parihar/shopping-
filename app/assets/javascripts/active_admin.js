@@ -65,16 +65,18 @@ document.addEventListener("DOMContentLoaded", () => {
         grandTotalEl.innerText = grandTotal.toFixed(2);
       }
     }
-
-
   
     document.querySelectorAll(".increase-btn").forEach((button) => {
       button.addEventListener("click", function () {
+        console.log("click")
         let productId = this.dataset.id;
+        console.log(this)
+        console.log(productId)
         let quantityElement = document.getElementById(`quantity-${productId}`);
+        console.log(quantityElement)
         let totalPriceElement = document.getElementById(`total-pay-${productId}`);
         let pricePerUnit = parseFloat(totalPriceElement.dataset.price);
-        console.log(productId)
+     
         let quantity = parseInt(quantityElement.innerText);
         quantity += 1;
         quantityElement.innerText = quantity;
@@ -82,9 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (window.location.pathname.split("/")[1] == "cart"){
         const url = window.location.pathname; 
+
         const segments = url.split("/");      
         const product = segments[segments.length - 1]; 
-        console.log(product); 
 
         fetch(`/update_cart_quantity`, {
           method: "POST",
@@ -92,12 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
             "Content-Type": "application/json",
             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
           },
-          body: JSON.stringify({ id: product, quantity: quantity })
+          body: JSON.stringify({ id: productId, quantity: quantity })
         }).then(response => {
           if (!response.ok) throw new Error("Failed to update cart");
         }).catch(console.error);
       }
-      
         updateQuantityInDB(productId, quantity)
         updateGrandTotal();
       });
@@ -135,17 +136,15 @@ document.addEventListener("DOMContentLoaded", () => {
           }).catch(console.error);
         }
   
-   
-        updateQuantityInDB(productId, quantity)
-        updateGrandTotal();
+          updateQuantityInDB(productId, quantity)
+          updateGrandTotal();
       });
     });
   });
 
   function updateQuantityInDB(productId, quantity) {
-    
     console.log(productId)
-    fetch(`/add_to_cards/${productId}/update_quantity`, {
+    fetch(`/admin/add_to_cards/${productId}/update_quantity`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

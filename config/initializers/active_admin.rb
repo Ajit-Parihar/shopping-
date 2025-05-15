@@ -141,7 +141,6 @@ end
   config.current_user_method = :current_admin_user
   # config.current_user_method = :fake_admin_user
 
-
   # == Logging Out
   #
   # Active Admin displays a logout link on each screen. These

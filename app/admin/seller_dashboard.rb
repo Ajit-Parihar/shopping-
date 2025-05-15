@@ -6,13 +6,14 @@ ActiveAdmin.register_page "SellerDashboard" do
     columns do
       column do 
         panel "Your Businesses", class: "scrollable-panel" do 
-          businesses = Business.joins(:products)
-            .joins("INNER JOIN seller_products ON seller_products.business_id = businesses.id")
-            .where(seller_products: { seller_id: current_admin_user.id })
-            .where(products: { deleted_at: nil })
-            .distinct
+          businesses = Business
+         .joins("INNER JOIN seller_products ON seller_products.business_id = businesses.id")
+         .joins("INNER JOIN products ON products.id = seller_products.product_id")
+         .where(seller_products: { seller_id: current_admin_user.id })
+         .where(products: { deleted_at: nil })
+         .distinct
 
-          render partial: "seller/business", locals: { businesses: businesses }
+        render partial: "seller/business", locals: { businesses: businesses }
         end
       end
 

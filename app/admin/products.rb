@@ -8,20 +8,27 @@ ActiveAdmin.register Product do
   #     link_to 'New Product', new_admin_product_path
   #   end
   # end
-
-  scope :all, default: true
-  permit_params :name, :price, :brand_name, :discription, :image, :business_id, :rating, :seller_id
+  
+  scope :all, default: true do |products|
+    if current_admin_user.seller?
+      seller_product_ids = SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id)
+      products.where.not(id: seller_product_ids)
+    else
+       products.where(deleted_at: nil)
+    end
+  end
+    permit_params :name, :price, :brand_name, :discription, :image, :business_id, :rating, :seller_id
   filter :name
   filter :brand_name
-
 
   controller do
     def scoped_collection
       if current_admin_user.admin?
         Product.with_deleted
         elsif current_admin_user.seller?
-          seller_product_ids = SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id)
-          Product.where.not(id: seller_product_ids)
+          # seller_product_ids = SellerProduct.where(seller_id: current_admin_user.id).pluck(:product_id)
+          # Product.where.not(id: seller_product_ids)
+          Product.where(deleted_at: nil)
         else
         Product.where(deleted_at: nil)
       end
@@ -29,7 +36,6 @@ ActiveAdmin.register Product do
 
     def show
       @product = Product.find_by(id: params[:id])
-    
       if @product.nil?
         redirect_to admin_products_path, alert: "Product not found."
       end
@@ -47,41 +53,42 @@ ActiveAdmin.register Product do
               collection: Business.pluck(:category, :id),
               label: "Product Category"
     end
-    f.actions
+    f.actions 
   end
 
- index do
-    selectable_column
-     column :image do |product|
-      if product.image.attached?
-        image_tag url_for(product.image), alt: product.name, style: "max-width: 300px;", class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
-      else
-        "No Image"
+  index do
+      selectable_column 
+      column :image do |product|
+        if product.image.attached?
+          image_tag url_for(product.image), alt: product.name, style: "max-width: 300px;", class: "product-thumb", onclick: "event.stopPropagation(); highlightImage(this)"
+        else
+          "No Image"
+        end
+      end
+
+      column :name
+      column :price do |product|
+        number_to_currency(product.price, unit: "₹", precision: 0)
+      end
+      column :brand_name
+      column "Rating" do |product|
+        product.rating || "Rating Not found"
+      end
+
+    actions defaults: false do |product|
+    
+      item "View", resource_path(product), class: "member_link"
+    
+      if product.deleted_at.present?
+        if can?(:update, product) 
+          item "Restore", restore_admin_product_path(product),
+              method: :put,
+              data: { confirm: "Are you sure you want to restore this product?" },
+              class: "member_link"
+        end
       end
     end
-
-    column :name
-    column :price do |product|
-      number_to_currency(product.price, unit: "₹", precision: 0)
-    end
-    column :brand_name
-    column "Rating" do |product|
-      product.rating || "Rating Not found"
-    end
-
-actions defaults: false do |product|
-  item "View", resource_path(product), class: "member_link"
-
-  if product.deleted_at.present?
-    if can?(:update, product) 
-      item "Restore", restore_admin_product_path(product),
-           method: :put,
-           data: { confirm: "Are you sure you want to restore this product?" },
-           class: "member_link"
-    end
   end
- end
-end
 
   show do |res|
     table_for res do 
@@ -96,9 +103,10 @@ end
       column "Buy" do |res|
         span link_to("Buy", admin_buy_path(product_id: res.id), class: "button buy-button")
       end 
-      column "Add To card" do 
-       span link_to("Add to Cart", admin_addtocard_path(product_id: res), class: "button cart-button")
+      column "Add To Cart" do |res|
+        span link_to("Add to Cart", add_product_admin_add_to_cards_path(product_id: res.id), method: :post, class: "button cart-button")
       end
+      
     end
   end
     

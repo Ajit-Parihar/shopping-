@@ -7,7 +7,6 @@ class HomeController < ApplicationController
 
   def product 
      @products = Product.where(business_id: params[:id])
-     
   end
 
   def addToCart
@@ -30,6 +29,9 @@ class HomeController < ApplicationController
   
   def cart
     @cart = cookies[:cart] ? JSON.parse(cookies[:cart]) : []
+    puts "working good "
+    puts @cart.inspect
+   
     @products_in_cart = @cart.map do |item|
       product = Product.find(item["id"])  
       { product: product, quantity: item["quantity"] }
@@ -37,12 +39,9 @@ class HomeController < ApplicationController
   end
 
   def update_cart_quantity
-
     product_id = params[:id].to_i
     new_quantity = params[:quantity].to_i
 
-    puts "product #{product_id.inspect}"
-    puts "quantity #{new_quantity.inspect}"
   
     cart = cookies[:cart] ? JSON.parse(cookies[:cart]) : []
   
@@ -61,14 +60,16 @@ class HomeController < ApplicationController
     raw = cookies[:cart]
     cart = raw.present? ? JSON.parse(raw, symbolize_names: true) : []
   
-    cart.reject! { |item| item[:product] == params[:id].to_i }
-
+cart.reject! { |item| item[:id] == params[:id].to_i }
     cookies[:cart] = {
       value: JSON.generate(cart),
       expires: 1.week.from_now
     }
-
      redirect_to cart_path
+  end
+
+  def product_show 
+    @product = Product.find(params[:id])
   end
   
   private

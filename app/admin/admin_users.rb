@@ -24,11 +24,9 @@ ActiveAdmin.register AdminUser do
     end
   end
 
-  # Filters
   filter :first_name_or_last_name_cont, label: "Name"
   filter :user_type, as: :select, collection: -> { AdminUser.distinct.pluck(:user_type) }
 
-  # Index page
   index do
     selectable_column
     id_column
@@ -43,7 +41,7 @@ ActiveAdmin.register AdminUser do
     actions defaults: false do |user|
       item "View", resource_path(user), class: "member_link"
       item "Edit", edit_resource_path(user), class: "member_link"
-
+    
       unless user.deleted_at.present?
         item "Delete", resource_path(user),
              method: :delete,
@@ -77,7 +75,15 @@ ActiveAdmin.register AdminUser do
               label: "User Type"
     end
  end
-    f.actions
+    f.actions do 
+      if current_admin_user.admin?
+        f.action :submit, label: "Create Rating"
+        f.cancel_link(admin_admin_users_path)  
+      else
+        f.action :submit, label: "Create Rating"
+        f.cancel_link(admin_profile_path)  
+      end
+    end
   end
 
   show do
@@ -89,7 +95,6 @@ ActiveAdmin.register AdminUser do
     end
   end
 
-  # Member action for restoring deleted user
   member_action :restore, method: :put do
     resource.restore
     redirect_to admin_admin_users_path, notice: "User restored successfully!"

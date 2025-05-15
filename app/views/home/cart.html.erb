@@ -2,6 +2,8 @@
   <div class="nav-left">
     <a href="/" class="nav-brand">MyStore</a>
   </div>
+ 
+
   <div class="nav-right">
         <%=link_to "Your Cart", cart_path, class: "nav-link"%>
 
@@ -14,7 +16,7 @@
   </div>
 </nav>
 
-<div class="cart-container">
+  <div class="cart-container">
   <% @products_in_cart.each do |item| %>
     <div class="cart-item">
       <div class="cart-image">
@@ -28,8 +30,7 @@
         <%=puts "print #{item.inspect}"%>
         <%= render partial: "admin/quantitywithoutlogin", locals: { cart: item } %>
       </div>
-         <%= link_to "remove", addtocart_remove_path(item[:product]), method: :post %>
+         <%= link_to "remove", addtocart_remove_path(item[:product]), method: :post, class: "button buy-button"%>
     </div>
-
   <% end %>
 </div>

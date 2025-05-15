@@ -1,12 +1,12 @@
 class Order < ApplicationRecord
-  acts_as_paranoid
+  # acts_as_paranoid
 
   belongs_to :user, class_name: 'AdminUser'
   belongs_to :product
   belongs_to :user_address, class_name: "UserAddress", foreign_key: "address_id"
   belongs_to :seller, class_name: 'AdminUser'
   belongs_to :business
-  has_one :rating, dependent: :destroy 
+  has_one :rating, dependent: :destroy
 
 
 
