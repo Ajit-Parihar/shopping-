@@ -5,17 +5,20 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
 
-
     raw = cookies[:cart]
       @cart_data = raw.present? ? JSON.parse(raw, symbolize_names: true) : []
       
       @cart_data.each do |item|
         product_id = item[:id] || item[:product]
         quantity = item[:quantity]
-      
+        
+        if current_admin_user.seller?
+         unless SellerProduct.find_by(seller_id: current_admin_user.id, product_id: product_id)
         cart = AddToCard.find_or_initialize_by(product_id: product_id, admin_user_id: current_admin_user.id)
         cart.quantity = quantity
         cart.save
+         end
+        end
       end
 
     cookies.delete(:cart) 

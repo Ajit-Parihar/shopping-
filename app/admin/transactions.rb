@@ -1,5 +1,5 @@
 ActiveAdmin.register Transaction do
-  menu false
+  # menu false
    permit_params :seller_id, :product_id, :amount
    config.batch_actions =false
    filter :product

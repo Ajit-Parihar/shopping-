@@ -174,7 +174,11 @@ ActiveAdmin.register Order do
   end
 
   member_action :cancel_order, method: :post do
-    resource.update(status_type: "cancelled")
-    redirect_to admin_order_path(resource.id), notice: "Order Cancel Succssfully"
+    puts "working order"
+    order = Order.find(params[:id])
+    order.update(status_type: "cancelled")
+    # puts resource.inspect
+    # resource.update(status_type: "cancelled")
+    redirect_to admin_orders_path, notice: "Order Cancel Succssfully"
   end
 end
