@@ -1,5 +1,5 @@
 class Order < ApplicationRecord
-  # acts_as_paranoid
+  acts_as_paranoid
 
   belongs_to :user, class_name: 'AdminUser'
   belongs_to :product

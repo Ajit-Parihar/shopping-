@@ -1,5 +1,5 @@
 class Rating < ApplicationRecord
-  # acts_as_paranoid
+  acts_as_paranoid
 
   belongs_to :admin_user
   belongs_to :product
@@ -14,14 +14,13 @@ class Rating < ApplicationRecord
               less_than_or_equal_to: 5,
               message: "Rating must be between 1 and 5"
             }
+            
+            validates :comments,
+            length: { minimum: 10, message: "Comment must be at least 10 characters" },
+            allow_blank: true
 
-  validates :comments,
-            presence: { message: "Please provide a comment for your review" },
-            length: { minimum: 10, message: "Comment must be at least 10 characters" }
-
-            validate :photos_format
-            validates :photos, presence: { message: "must be attached" }
-            private
+            validate :photos_format, if: -> { photos.attached? }
+       private
             
             def photos_format
               photos.each do |photo|
@@ -32,6 +31,7 @@ class Rating < ApplicationRecord
                 end
               end
             end
+
   after_save :update_product_average_rating
 
   private

@@ -1,5 +1,5 @@
 ActiveAdmin.register_page "Profile" do
-  menu false  
+  # menu false  
   
   content title: "My Profile" do
     panel "Admin Details" do

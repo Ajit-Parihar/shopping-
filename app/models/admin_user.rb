@@ -1,31 +1,31 @@
-class AdminUser < ApplicationRecord
-  acts_as_paranoid
+  class AdminUser < ApplicationRecord
+    acts_as_paranoid
 
-  user_type = [ "admin", "user", "seller" ]
-  USER_TYPES = user_type
+    user_type = [ "admin", "user", "seller" ]
+    USER_TYPES = user_type
 
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+    devise :database_authenticatable, :registerable,
+          :recoverable, :rememberable, :validatable
 
-         has_one :seller_product, foreign_key: "seller_id", dependent: :destroy
-         has_many :orders_as_user, class_name: 'Order', foreign_key: 'user_id', dependent: :destroy
-         has_many :orders_as_seller, class_name: 'Order', foreign_key: 'seller_id', dependent: :destroy
-         has_many :ratings, dependent: :destroy
-         has_many :user_addresses, foreign_key: 'user_id', dependent: :destroy
-         has_many :transactions, foreign_key: 'seller_id', dependent: :destroy
-         has_many :add_to_cards, dependent: :destroy
+          has_one :seller_product, foreign_key: "seller_id", dependent: :destroy
+          has_many :orders_as_user, class_name: 'Order', foreign_key: 'user_id', dependent: :destroy
+          has_many :orders_as_seller, class_name: 'Order', foreign_key: 'seller_id', dependent: :destroy
+          has_many :ratings, dependent: :destroy
+          has_many :user_addresses, foreign_key: 'user_id', dependent: :destroy
+          has_many :transactions, foreign_key: 'seller_id', dependent: :destroy
+          has_many :add_to_cards, dependent: :destroy
 
-         def restore_with_dependents
-          restore
-        
-          ratings.only_deleted.each(&:restore)
-          user_addresses.only_deleted.each(&:restore)
-          orders_as_user.only_deleted.each(&:restore)
-          orders_as_seller.only_deleted.each(&:restore)
-          transactions.only_deleted.each(&:restore)
-          add_to_cards.only_deleted.each(&:restore)
-          seller_product&.restore
-        end
+          def restore_with_dependents
+            restore
+          
+            ratings.only_deleted.each(&:restore)
+            user_addresses.only_deleted.each(&:restore)
+            orders_as_user.only_deleted.each(&:restore)
+            orders_as_seller.only_deleted.each(&:restore)
+            transactions.only_deleted.each(&:restore)
+            add_to_cards.only_deleted.each(&:restore)
+            seller_product&.restore
+          end
 
 validates :first_name,
   presence: { message: "First name is required" },

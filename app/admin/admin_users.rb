@@ -1,13 +1,7 @@
 ActiveAdmin.register AdminUser do
   permit_params :first_name, :last_name, :email, :password, :password_confirmation, :user_type
 
-  # Show menu only for admin users
   menu if: proc { current_admin_user.admin? }
-
-  # Alternative menu logic (commented)
-  # menu if: proc { current_admin_user.user? || current_admin_user.seller? },
-  #      label: "My Profile",
-  #      url: proc { "/admin/admin_users/#{current_admin_user.id}/edit" }
 
   # Batch action to send welcome email
   batch_action :send_welcome_email do |selected_ids|
@@ -17,7 +11,6 @@ ActiveAdmin.register AdminUser do
     redirect_to collection_path, notice: "Welcome email sent successfully"
   end
 
-  # Controller customization to include soft-deleted users
   controller do
     def scoped_collection
       AdminUser.with_deleted.where(user_type: ['seller', 'user'])
@@ -39,21 +32,21 @@ ActiveAdmin.register AdminUser do
     column :user_type
 
     actions defaults: false do |user|
-      item "View", resource_path(user), class: "member_link"
-      item "Edit", edit_resource_path(user), class: "member_link"
-    
+      item "View", resource_path(user), class: "button buy-button"
+      item "Edit", edit_resource_path(user), class: "button buy-button"
+
       unless user.deleted_at.present?
         item "Delete", resource_path(user),
              method: :delete,
              data: { confirm: "Are you sure?" },
-             class: "member_link delete_link"
+             class: "button buy-button"
       end
 
       if user.deleted_at.present?
         item "Restore", restore_admin_admin_user_path(user),
              method: :put,
              data: { confirm: "Are you sure you want to restore this user?" },
-             class: "member_link"
+             class: "button buy-button"
       end
     end
   end
@@ -68,13 +61,15 @@ ActiveAdmin.register AdminUser do
         f.input :password
         f.input :password_confirmation
       end
-    if current_admin_user.admin?
-      f.input :user_type,
-              as: :radio,
-              collection: [["Seller", "seller"], ["User", "user"]],
-              label: "User Type"
+
+      if current_admin_user.admin?
+        f.input :user_type,
+                as: :radio,
+                collection: [["Seller", "seller"], ["User", "user"]],
+                label: "User Type"
+      end
     end
- end
+
     f.actions do 
       if current_admin_user.admin?
         f.action :submit, label: "Create Rating"
@@ -96,7 +91,7 @@ ActiveAdmin.register AdminUser do
   end
 
   member_action :restore, method: :put do
-    resource.restore
+    resource.restore_with_dependents
     redirect_to admin_admin_users_path, notice: "User restored successfully!"
   end
 end

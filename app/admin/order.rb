@@ -1,14 +1,13 @@
 ActiveAdmin.register Order do
   permit_params :user_id, :product_id, :seller_id, :business_id
-  # actions :all, except: [:new, :create]
   batch_action :destroy, false
 
   filter :product_name_cont, as: :string, label: "Product Name"
-  
+
   filter :business, as: :select, collection: -> {
     Business.joins(:products).distinct.pluck(:category, :id)
   }, label: "Business"
-  
+
   filter :status_type, as: :select, collection: -> {
     %w[ordered processing shipped out_for_delivery delivered cancelled]
   }
@@ -30,7 +29,11 @@ ActiveAdmin.register Order do
   index do
     selectable_column
     column "Product" do |order|
-      image_tag(order.product.image, style: "max-width: 300px;", class: "product-thumb", onclick: "highlightImage(this)")
+      if order.product.image.attached?
+        image_tag(order.product.image, style: "max-width: 300px;", class: "product-thumb", onclick: "highlightImage(this)")
+      else
+        "image not found"
+      end
     end
     column "product Name" do |order|
       order.product.name
@@ -74,6 +77,9 @@ ActiveAdmin.register Order do
     attributes_table do
       row :id
       row :status_type
+      row "purchesed by" do |resource|
+        "#{resource.user.first_name} #{resource.user.last_name}"
+      end
       row "Order Placed" do |resource|
         resource.created_at.strftime("%B %d, %Y %I:%M")
       end
@@ -89,7 +95,11 @@ ActiveAdmin.register Order do
       end
 
       row "Order Deliver Address" do |resource|
-        resource.user_address.full_address
+        unless resource.user_address == nil
+          resource.user_address.full_address
+        else
+          "Address Not Found"
+        end
       end
     end
 
@@ -147,7 +157,11 @@ ActiveAdmin.register Order do
       table_for resource.product do
         column "Image" do |p|
           link_to admin_product_path(p.id) do
-            image_tag(p.image, style: "max-width: 100px;")
+            if p.image.attached?
+              image_tag(p.image, style: "max-width: 100px;")
+            else
+              "image not found"
+            end
           end
         end
 
@@ -177,8 +191,6 @@ ActiveAdmin.register Order do
     puts "working order"
     order = Order.find(params[:id])
     order.update(status_type: "cancelled")
-    # puts resource.inspect
-    # resource.update(status_type: "cancelled")
     redirect_to admin_orders_path, notice: "Order Cancel Succssfully"
   end
 end

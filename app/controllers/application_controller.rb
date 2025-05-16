@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   before_action :set_current_admin_user
   before_action :configure_permitted_parameters, if: :devise_controller?
 
+
+
   def after_sign_in_path_for(resource)
 
     raw = cookies[:cart]
@@ -18,11 +20,13 @@ class ApplicationController < ActionController::Base
         cart.quantity = quantity
         cart.save
          end
+        elsif current_admin_user.user?
+             cart = AddToCard.find_or_initialize_by(product_id: product_id, admin_user_id: current_admin_user.id)
+             cart.quantity = quantity
+             cart.save
         end
       end
-
-    cookies.delete(:cart) 
-   
+        cookies.delete(:cart) 
     super
   end
 

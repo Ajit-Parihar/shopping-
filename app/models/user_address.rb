@@ -2,8 +2,7 @@ class UserAddress < ApplicationRecord
   acts_as_paranoid
 
   belongs_to :user, class_name: "AdminUser"
-  has_many :orders, foreign_key: "address_id"
-
+  has_many :orders, foreign_key: "address_id", dependent: :nullify
   def full_address
     [
       house_no, "Gali No. #{gali_no}", town, block, dist, state, country

@@ -54,6 +54,7 @@ ActiveAdmin.register Rating do
       f.cancel_link(admin_orders_path) 
     end
   end
+  
 
    show do
       attributes_table do 

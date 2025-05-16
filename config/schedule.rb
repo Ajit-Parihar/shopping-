@@ -18,7 +18,7 @@
 # end
 set :output, "./log/cron.log"
 
-every 1.minutes do 
+every 1.days do 
      runner "puts 'hello, world '"
-     rake "cleanup:old_soft_deleted_products"       
+     rake "cleanup:old_soft_deleted_products"
 end

@@ -14,18 +14,6 @@ ActiveAdmin.register Business do
   scope :all, default: true
 
   controller do
-    #  before_action :store_referrer
-    # @path = false
-    #   def store_referrer
-    #     session[:previous_page] = request.referer
-    #     puts session[:previous_page]
-    #     if session[:previous_page] == "http://[::1]:3000/admin/sellerdashboard"
-    #       @path = true
-    #     else
-    #       puts "No referrer found."
-    #     end
-    #   end
-
     def scoped_collection
       if current_admin_user.admin? || current_admin_user.user?
         Business.joins(:products).distinct

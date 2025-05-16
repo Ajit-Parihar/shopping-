@@ -7,6 +7,7 @@ class Ability
        can :manage, ActiveAdmin::Page, :name => "AllTransactions"
        can :read, Business
        can :manage, Product
+       cannot :create, Product
        can :read, Order
        can :manage, AdminUser
        can :read, Transaction
@@ -23,7 +24,6 @@ class Ability
       can :manage, UserAddress
       can :manage, ActiveAdmin::Page, :name => "OrderTracker"
       can :manage, ActiveAdmin::Page, :name => "Profile"
-      # can :read, AdminUser
       can [:read, :update], AdminUser
       can :read, Transaction
       can :read, AddToCard

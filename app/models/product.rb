@@ -10,23 +10,16 @@ class Product < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_one_attached :image
 
-
   
   def restore_with_dependents
     restore
-    reload
-    # Restore dependent records
-
+  
     orders.only_deleted.each(&:restore)
     ratings.only_deleted.each(&:restore)
     add_to_cards.only_deleted.each(&:restore)
     transactions.only_deleted.each(&:restore)
     seller_products.only_deleted.each(&:restore)
   end
-
-
-
-
 
   validates :name, presence: { message: "Product name can't be blank." }, 
                    length: { in: 3..100, message: "Product name must be between 3 and 100 characters." }
@@ -73,4 +66,5 @@ end
       business_id: self.business_id
     )
   end
+
 end

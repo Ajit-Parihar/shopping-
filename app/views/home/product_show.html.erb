@@ -1,8 +1,6 @@
-
-
 <nav class="custom-navbar">
   <div class="nav-left">
-    <a href="/" class="nav-brand">MyStore</a>
+    <a href="/" class="nav-brand">MyStore</a>                                                           
   </div>
   <div class="nav-right">
     <%=link_to "Your Cart", cart_path, class: "nav-link"%>
@@ -10,20 +8,22 @@
       <a href="/admin/logout" class="nav-link">Logout</a>
     <% else %>
       <a href="/admin/login" class="nav-link">Login</a>
-      <a href ="admin/sign_up" class="nav-link">Sign UP</a>
+      <a href ="/admin/sign_up" class="nav-link">Sign UP</a>
     <% end %>
   </div>
 </nav>
 
-      <div class="product-card">
-        <%= link_to product_show_path(@product), class: "product-card-link" do %>
-        <% if @product.image.attached? %>
-          <%= image_tag url_for(@product.image), alt: @product.name %>
-        <% else %>
-          <p>No image available</p>
-        <% end %>
-         <% end %> 
+<div class="product-card">
+<div class="products-grid">
 
+    <%= link_to product_show_path(@product), class: "product-card-link" do %>
+      <% if @product.image.attached? %>
+        <%= image_tag url_for(@product.image), alt: @product.name %>
+      <% else %>
+        <p>No image available</p>
+      <% end %>
+    <% end %>
+</div>
 
         <h2><%= @product.name %></h2>
         <p><strong>Brand:</strong> <%= @product.brand_name %></p>
@@ -31,12 +31,10 @@
         <p><strong>Description:</strong> <%= @product.discription %></p>
         <p><strong>Rating:</strong> <%= @product.rating %> ⭐</p>
 
-     
         <div class="product-buttons">
           <%=link_to "Buy", admin_user_session_path%>
           <%=link_to "Add To Cart", addToCart_path(@product.id), method: :post %>
         </div>
-
 
       </div>
          

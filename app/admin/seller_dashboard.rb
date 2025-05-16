@@ -19,10 +19,15 @@ ActiveAdmin.register_page "SellerDashboard" do
 
       column do
         panel "Your Products", class: "scrollable-panel" do
-          products = Product.joins(:seller_products)
+
+          products = Product.with_deleted
+            .joins(:seller_products)
+            .merge(SellerProduct.with_deleted)
             .where(seller_products: { seller_id: current_admin_user.id })
-            .where(deleted_at: nil)
             .distinct
+
+            puts "print products"
+            puts products.inspect
 
           render partial: "seller/product", locals: { products: products }
         end
