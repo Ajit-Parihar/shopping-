@@ -168,9 +168,11 @@ ActiveAdmin.register Product do
     end
   end
 
-  member_action :restore, method: :put do
-    Product.restore(resource.id)
-    resource.restore_with_dependents
+    
+    member_action :restore, method: :put do
+  product = Product.with_deleted.find(params[:id])
+  product.restore
+     product.restore_with_dependents
     redirect_to admin_products_path, notice: "Product and related records restored successfully!"
   end
 end

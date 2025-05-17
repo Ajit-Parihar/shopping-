@@ -19,12 +19,11 @@ ActiveAdmin.register_page "SellerDashboard" do
 
       column do
         panel "Your Products", class: "scrollable-panel" do
+products = Product.with_deleted
+  .joins("LEFT JOIN seller_products ON seller_products.product_id = products.id AND seller_products.deleted_at IS NULL OR seller_products.deleted_at IS NOT NULL")
+  .where("seller_products.seller_id = ?", current_admin_user.id)
+  .distinct
 
-          products = Product.with_deleted
-            .joins(:seller_products)
-            .merge(SellerProduct.with_deleted)
-            .where(seller_products: { seller_id: current_admin_user.id })
-            .distinct
 
             puts "print products"
             puts products.inspect

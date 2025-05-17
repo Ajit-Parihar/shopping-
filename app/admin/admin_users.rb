@@ -13,9 +13,25 @@ ActiveAdmin.register AdminUser do
 
   controller do
     def scoped_collection
-      AdminUser.with_deleted.where(user_type: ['seller', 'user'])
+      if current_admin_user.admin?
+         AdminUser.with_deleted.where(user_type: ['seller', 'user'])
+      else
+         AdminUser.where(id: current_admin_user.id)
+      end
+    end
+
+  before_action :check_not_deleted, only: [:show, :edit, :update]
+   
+private
+
+  def check_not_deleted
+    if resource.deleted_at.present?
+      redirect_to admin_admin_users_path, alert: " Cannot view or edit a deleted user."
     end
   end
+end
+
+
 
   filter :first_name_or_last_name_cont, label: "Name"
   filter :user_type, as: :select, collection: -> { AdminUser.distinct.pluck(:user_type) }
@@ -55,7 +71,8 @@ ActiveAdmin.register AdminUser do
     f.inputs "Admin User Details" do
       f.input :first_name
       f.input :last_name
-      f.input :email
+      
+      # f.input :email
 
       if f.object.new_record?
         f.input :password
@@ -94,4 +111,6 @@ ActiveAdmin.register AdminUser do
     resource.restore_with_dependents
     redirect_to admin_admin_users_path, notice: "User restored successfully!"
   end
+
+
 end

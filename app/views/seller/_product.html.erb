@@ -15,7 +15,11 @@
       <div class="product-price">₹<%= product.price %></div>
       <div class="product-description"><%= product.discription %></div>
    <%= link_to "Edit", edit_admin_product_path(product), class: "btn edit-btn" %>
+     <%unless product.deleted_at%>
    <%= link_to "Delete", admin_product_path(product), method: :delete, data: { confirm: "Are you sure?" }, class: "btn delete-btn" %>
+   <%else%>
+   <%= link_to "restore", restore_admin_product_path(product), method: :put, data: {confirm: "Are you sure you want to resore this product?"}, class: "btn delete-btn"%>
+   <%end%>
     </div>
   <% end %>
 </div>

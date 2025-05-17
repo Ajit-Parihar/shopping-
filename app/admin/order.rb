@@ -80,6 +80,11 @@ ActiveAdmin.register Order do
       row "purchesed by" do |resource|
         "#{resource.user.first_name} #{resource.user.last_name}"
       end
+
+      row "seller" do |resource|
+        "#{resource.seller.first_name} #{resource.seller.last_name}"
+      end
+
       row "Order Placed" do |resource|
         resource.created_at.strftime("%B %d, %Y %I:%M")
       end
@@ -180,9 +185,7 @@ ActiveAdmin.register Order do
           resource.quantity
         end
 
-        column "Seller" do |p|
-          resource.seller.first_name
-        end
+ 
       end
     end
   end

@@ -24,7 +24,7 @@ class Ability
       can :manage, UserAddress
       can :manage, ActiveAdmin::Page, :name => "OrderTracker"
       can :manage, ActiveAdmin::Page, :name => "Profile"
-      can [:read, :update], AdminUser
+      can [:edit,:update], AdminUser
       can :read, Transaction
       can :read, AddToCard
       can :manage, ActiveAdmin::Page, :name => "Buy"
@@ -39,7 +39,7 @@ class Ability
       can :buy_product, Product
       can :read, Order
       can :manage, Rating
-      can [:read, :update], AdminUser
+      can [:read,:edit,:update], AdminUser
       can :manage, ActiveAdmin::Page, :name => "OrderTracker"
       can :manage, ActiveAdmin::Page, :name => "Profile"
      end
